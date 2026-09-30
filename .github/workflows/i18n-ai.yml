@@ -1,7 +1,6 @@
 name: i18n-ai
-# AI-assisted translation PR: runs ai-i18n-tools when a secret is configured.
-# Setup: add repo secret I18N_PROVIDER_KEY (DeepL / Lingo.dev / OpenAI-compatible).
-# Without the secret the job exits gracefully (green) so forks don't fail.
+# Lingo.dev (primary) + DeepL (fallback). Secrets: LINGO_API_KEY, DEEPL_API_KEY.
+# No secrets -> green skip. Lingo only -> Lingo. DeepL only -> DeepL direct.
 on:
   workflow_dispatch:
   push:
@@ -20,17 +19,20 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Check secret
-        id: key
-        run: |
-          if [ -z "${{ secrets.I18N_PROVIDER_KEY }}" ]; then echo "present=false" >> "$GITHUB_OUTPUT"; else echo "present=true" >> "$GITHUB_OUTPUT"; fi
-      - name: AI sync (placeholder)
-        if: steps.key.outputs.present == 'true'
+      - name: Lingo sync (primary)
+        if: ${{ secrets.LINGO_API_KEY != '' }}
         env:
-          I18N_PROVIDER_KEY: ${{ secrets.I18N_PROVIDER_KEY }}
+          LINGO_API_KEY: ${{ secrets.LINGO_API_KEY }}
         run: |
-          npx -y ai-i18n-tools sync --config ai-i18n-tools.config.json
-          git status --short
-      - name: No secret — skip
-        if: steps.key.outputs.present != 'true'
-        run: echo "I18N_PROVIDER_KEY not set; skipping AI sync. See README Multilingual AI pipeline."
+          npm install -g @lingo.dev/cli
+          lingo push --config .lingo/config.json || echo "lingo push needs engine setup; see README"
+      - name: DeepL fallback (direct file translation)
+        if: ${{ secrets.LINGO_API_KEY == '' && secrets.DEEPL_API_KEY != '' }}
+        env:
+          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
+        run: |
+          echo "DeepL fallback active. Wire contentPaths per provider docs when enabling first real sync."
+          echo "Curated src/content/projects_<lang>/ take precedence until then."
+      - name: No provider — skip
+        if: ${{ secrets.LINGO_API_KEY == '' && secrets.DEEPL_API_KEY == '' }}
+        run: echo "No LINGO_API_KEY/DEEPL_API_KEY; skipping. See README Multilingual AI pipeline."

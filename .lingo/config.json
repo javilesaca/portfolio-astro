@@ -1,0 +1,9 @@
+{
+  "engine": "portfolio-multilingual",
+  "sourceLocale": "es",
+  "targetLocales": ["en", "fr", "de", "pt", "it"],
+  "primary": "lingo",
+  "fallback": "deepl",
+  "glossary": ["case study", "TechBadge", "ProjectCard", "offline-first", "RAWG API"],
+  "note": "Create engine 'portfolio-multilingual' at lingo.dev, attach glossary + brand voice + GEMBA reviewer. Fallback uses DeepL API for EU pairs when Lingo is unavailable."
+}

@@ -49,4 +49,6 @@ This portfolio ships in 6 languages (ES, EN, FR, DE, PT, IT) with a professional
 - **Routing:** `/` (ES default) + `/en/`, `/fr/`, `/de/`, `/pt/`, `/it/` with `hreflang` es/en/fr/de/pt/it/x-default and x2–x6 sitemap coverage.
 - **Architecture:** typed dictionaries in `src/i18n/` (`getDict(lang)`), `lang` prop on Header/Hero/ProjectCard, `LangSelector.astro` dropdown with cross-language path mapping.
 - **AI-assisted translation:** UI strings and page bodies generated with an LLM agent workflow (glossary: product names, tech stack and "case study" stay untranslated; brand voice preserved per locale), then human-reviewed commit by commit.
-- **Next step:** wire a translation-memory CI (e.g. `ai-i18n-tools` or Lingo.dev engine with GEMBA scoring) so every ES change opens an auto-translation PR with preview instead of manual sync.
+- **Providers:** Lingo.dev engine `portfolio-multilingual` (primary: glossary + brand voice + GEMBA reviewer + GitHub App auto-PR) with DeepL API fallback for EU pairs.
+- **Setup:** repo secrets `LINGO_API_KEY` and optional `DEEPL_API_KEY` (GitHub Settings → Secrets → Actions). Without secrets, `i18n-ai.yml` skips green; curated `src/content/projects_<lang>/` remain source of truth.
+- **Quality gate:** `i18n-check.yml` enforces build + locale presence + no EN leftovers on every push/PR.
