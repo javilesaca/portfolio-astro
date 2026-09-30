@@ -47,7 +47,34 @@ const projects = (await getCollection('projects')).sort((a, b) => Number(b.data.
         <label for="email">Email<input id="email" name="email" type="email" required autocomplete="email" /></label>
         <label for="mensaje">Mensaje<textarea id="mensaje" name="mensaje" rows="5" required></textarea></label>
         <button class="btn btn--primary btn--md" type="submit">Enviar mensaje</button>
+        <p class="form__status" data-form-status role="status" aria-live="polite" hidden></p>
       </form>
+      <script>
+        const form = document.querySelector('form[name="contacto"]');
+        const status = document.querySelector('[data-form-status]');
+        form?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!form || !status) return;
+          const btn = form.querySelector('button[type="submit"]');
+          status.hidden = false;
+          status.textContent = 'Enviando…';
+          if (btn instanceof HTMLButtonElement) btn.disabled = true;
+          try {
+            const res = await fetch(form.action, {
+              method: 'POST',
+              body: new FormData(form),
+              headers: { Accept: 'application/json' },
+            });
+            if (!res.ok) throw new Error('send failed');
+            form.reset();
+            status.textContent = '¡Mensaje enviado! Te responderé lo antes posible.';
+          } catch {
+            status.textContent = 'No se pudo enviar. Escríbeme a javilesaca@javilesaca.pro';
+          } finally {
+            if (btn instanceof HTMLButtonElement) btn.disabled = false;
+          }
+        });
+      </script>
       <p class="alt">O por email: <a href="mailto:javilesaca@javilesaca.pro">javilesaca@javilesaca.pro</a></p>
       <p class="alt">¿Quieres mi CV? <a href="mailto:javilesaca@javilesaca.pro?subject=Solicitud%20de%20CV%20-%20Portfolio&body=Hola%20Javier%2C%0A%0AMe%20gustar%C3%ADa%20recibir%20tu%20CV.%20Mi%20nombre%20es%3A%0AMi%20empresa%2Fproyecto%20es%3A%0A%0AGracias.">Solicítalo aquí</a> y te lo envío personalmente.</p>
     </div>
