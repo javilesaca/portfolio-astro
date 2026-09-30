@@ -3,16 +3,19 @@
  * Base Layout — JaviLesacaPro Portfolio
  * Root layout with SEO, JSON-LD, fonts, global styles, skip link.
  */
+import type { Lang } from '../i18n';
 interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  lang?: Lang;
 }
 
 const {
   title = 'JaviLesacaPro',
   description = 'Portfolio de Javier Lesaca, IT Infrastructure & Software Developer.',
   ogImage = '/preview.jpg',
+  lang = 'es',
 } = Astro.props;
 
 const site = import.meta.env.SITE || 'https://javilesaca.pro';
@@ -65,7 +68,7 @@ const websiteJsonLd = {
 };
 ---
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
 <head>
   <meta charset="utf-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -93,6 +96,9 @@ const websiteJsonLd = {
 
   <!-- Canonical -->
   <link rel="canonical" href={new URL(Astro.url.pathname, site).href} />
+  <link rel="alternate" hreflang="es" href={new URL("/", site).href} />
+  <link rel="alternate" hreflang="en" href={new URL("/en/", site).href} />
+  <link rel="alternate" hreflang="x-default" href={new URL("/", site).href} />
 
   <!-- Preconnect fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -12,7 +12,7 @@ const d = getDict(lang);
 ---
 <header class="header" role="banner">
   <div class="header__inner container">
-    <a href="/" class="header__logo" aria-label="JaviLesacaPro - Inicio">
+    <a href={lang === "en" ? "/en/" : "/"} class="header__logo" aria-label="JaviLesacaPro - Inicio">
       <span class="header__logo-text">Javier Lesaca</span>
       <span class="header__logo-sub">IT Infrastructure & Software Developer</span>
     </a>
@@ -58,6 +58,11 @@ const d = getDict(lang);
           <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
         </svg>
       </button>
+      <div class="header__lang" role="group" aria-label="Idioma / Language">
+        <a href="/" class="header__lang-link" aria-current={lang === "es" ? "true" : undefined}>ES</a>
+        <span aria-hidden="true">/</span>
+        <a href="/en/" class="header__lang-link" aria-current={lang === "en" ? "true" : undefined}>EN</a>
+      </div>
     </nav>
   </div>
 </header>
@@ -205,6 +210,11 @@ const d = getDict(lang);
   .header__theme-icon--moon { display: none; }
   .header__theme[data-mode="light"] .header__theme-icon--sun { display: none; }
   .header__theme[data-mode="light"] .header__theme-icon--moon { display: block; }
+
+  .header__lang { display: flex; align-items: center; gap: 0.25rem; margin-left: var(--space-4); font-size: var(--text-sm); font-weight: var(--font-weight-medium); }
+  .header__lang-link { color: var(--color-text-muted); text-decoration: none; padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); }
+  .header__lang-link:hover { color: var(--color-brand); text-decoration: none; }
+  .header__lang-link[aria-current="true"] { color: var(--color-brand); }
 
   /* Mobile menu */
   @media (max-width: 48rem) {
