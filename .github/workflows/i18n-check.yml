@@ -1,0 +1,30 @@
+name: i18n-check
+on:
+  push:
+    paths:
+      - "src/pages/**"
+      - "src/content/**"
+      - "src/i18n/**"
+  pull_request:
+    paths:
+      - "src/pages/**"
+      - "src/content/**"
+      - "src/i18n/**"
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: No English leftovers in FR/DE/PT/IT homes
+        run: |
+          ! grep -rn "I have worked\|I look for roles\|Message sent! I will\|Could not send" src/pages/fr src/pages/de src/pages/pt src/pages/it
+      - name: Locales present
+        run: |
+          for l in en fr de pt it; do test -f src/pages/$l/index.astro || exit 1; done
+          test $(ls dist/en/ dist/fr/ dist/de/ dist/pt/ dist/it/ | wc -l) -gt 0
