@@ -4,6 +4,7 @@
   "sourceLocale": "es",
   "targetLocales": ["en", "fr", "de", "pt", "it"],
   "files": [
+    { "pattern": "src/content/projects/es/*.mdx" },
     { "pattern": "src/i18n/es.ts" }
   ]
 }

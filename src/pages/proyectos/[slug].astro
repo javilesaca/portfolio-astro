@@ -6,8 +6,8 @@ import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((p) => ({ params: { slug: p.id.replace(/\.mdx?$/,"") }, props: { project: p } }));
+  const projects = await getCollection('projects', ({ id }) => id.startsWith('es/'));
+  return projects.map((p) => ({ params: { slug: p.id.replace(/^es\//,"").replace(/\.mdx?$/,"") }, props: { project: p } }));
 }
 const { project } = Astro.props;
 const { Content } = await render(project);
