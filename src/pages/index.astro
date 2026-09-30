@@ -86,8 +86,6 @@ const projects = (await getCollection('projects')).sort((a, b) => Number(b.data.
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:var(--space-6);margin-top:var(--space-8)}
 .form{display:grid;gap:var(--space-4);margin-top:var(--space-6);text-align:left}
 .form label{display:grid;gap:var(--space-2)}
-.btn{display:inline-flex;justify-content:center;padding:var(--space-3) var(--space-6);border-radius:var(--radius-md);font-weight:600;background:var(--color-brand);color:#fff;border:2px solid var(--color-brand)}
-.btn:hover{background:var(--color-brand-hover)}
 .section h2{margin-bottom:var(--space-8)}
 .alt{margin-top:var(--space-4);color:var(--color-text-muted)}
 .areas{display:flex;flex-wrap:wrap;gap:var(--space-2);list-style:none;margin:var(--space-6) 0 0;padding:0;justify-content:center}

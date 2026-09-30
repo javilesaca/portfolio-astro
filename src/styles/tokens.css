@@ -9,8 +9,8 @@
  * ============================================================ */
 :root {
   /* Brand */
-  --color-brand: #2e8b57;           /* verde esmeralda — primary actions */
-  --color-brand-hover: #246b44;
+  --color-brand: #3aa564;           /* verde esmeralda — aclarado para contraste AA sobre fondo oscuro */
+  --color-brand-hover: #2e8b57;
   --color-brand-muted: rgba(46, 139, 87, 0.12);
 
   /* Neutral — dark mode first (default), light mode via media query */
