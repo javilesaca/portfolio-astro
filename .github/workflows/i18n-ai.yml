@@ -1,6 +1,7 @@
 name: i18n-ai
-# Lingo.dev (primary) + DeepL (fallback). Secrets: LINGO_API_KEY, DEEPL_API_KEY.
-# No secrets -> green skip. Lingo only -> Lingo. DeepL only -> DeepL direct.
+# Lingo.dev (primary) + DeepL (fallback).
+# Secrets: LINGO_API_KEY, DEEPL_API_KEY.
+# No secrets -> green skip.
 on:
   workflow_dispatch:
   push:
@@ -12,6 +13,9 @@ on:
 jobs:
   translate:
     runs-on: ubuntu-latest
+    env:
+      LINGO_API_KEY: ${{ secrets.LINGO_API_KEY }}
+      DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,19 +24,22 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Lingo sync (primary)
-        if: ${{ secrets.LINGO_API_KEY != '' }}
-        env:
-          LINGO_API_KEY: ${{ secrets.LINGO_API_KEY }}
+        if: env.LINGO_API_KEY != ''
         run: |
           npm install -g @lingo.dev/cli
-          lingo push --config .lingo/config.json || echo "lingo push needs engine setup; see README"
-      - name: DeepL fallback (direct file translation)
-        if: ${{ secrets.LINGO_API_KEY == '' && secrets.DEEPL_API_KEY != '' }}
-        env:
-          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
+          lingo push --config .lingo/config.json
+      - name: DeepL fallback
+        if: >
+          env.LINGO_API_KEY == '' &&
+          env.DEEPL_API_KEY != ''
         run: |
-          echo "DeepL fallback active. Wire contentPaths per provider docs when enabling first real sync."
-          echo "Curated src/content/projects_<lang>/ take precedence until then."
-      - name: No provider — skip
-        if: ${{ secrets.LINGO_API_KEY == '' && secrets.DEEPL_API_KEY == '' }}
-        run: echo "No LINGO_API_KEY/DEEPL_API_KEY; skipping. See README Multilingual AI pipeline."
+          echo "DeepL fallback active."
+          echo "Wire contentPaths per provider docs"
+          echo "before first real sync."
+      - name: No provider, skip
+        if: >
+          env.LINGO_API_KEY == '' &&
+          env.DEEPL_API_KEY == ''
+        run: >
+          echo "No provider keys; skipping.
+          See README Multilingual AI pipeline."
