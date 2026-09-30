@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://javilesaca.pro/sitemap-index.xml

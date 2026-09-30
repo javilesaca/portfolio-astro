@@ -1,0 +1,181 @@
+---
+/**
+ * Button — JaviLesacaPro Portfolio
+ * Reusable button component with variants, sizes, and states.
+ * Renders as <button> or <a> depending on href prop.
+ */
+interface Props {
+  children: string;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  loading?: boolean;
+  fullWidth?: boolean;
+  class?: string;
+  'aria-label'?: string;
+  'aria-describedby'?: string;
+}
+
+const {
+  children,
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  disabled = false,
+  loading = false,
+  fullWidth = false,
+  class: className = '',
+  'aria-label': ariaLabel,
+  'aria-describedby': ariaDescribedBy,
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+const classes = [
+  'btn',
+  `btn--${variant}`,
+  `btn--${size}`,
+  fullWidth && 'btn--full',
+  disabled && 'btn--disabled',
+  loading && 'btn--loading',
+  className,
+].filter(Boolean).join(' ');
+---
+<{Tag}
+  class={classes}
+  href={href}
+  type={href ? undefined : type}
+  disabled={disabled && !href}
+  aria-disabled={disabled}
+  aria-busy={loading}
+  aria-label={ariaLabel}
+  aria-describedby={ariaDescribedBy}
+  role={href ? undefined : 'button'}
+  tabindex={disabled && href ? -1 : undefined}
+>
+  {loading && <span class="btn__spinner" aria-hidden="true"></span>}
+  <span class="btn__text">{children}</span>
+</{Tag}>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  .btn--disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .btn--full {
+    width: 100%;
+  }
+
+  .btn--loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+  }
+
+  .btn__spinner {
+    position: absolute;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Sizes */
+  .btn--sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .btn--md {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-base);
+  }
+
+  .btn--lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-lg);
+  }
+
+  /* Variants */
+  .btn--primary {
+    background: var(--color-brand);
+    color: var(--color-text-inverse);
+    border-color: var(--color-brand);
+  }
+
+  .btn--primary:hover:not(.btn--disabled) {
+    background: var(--color-brand-hover);
+    border-color: var(--color-brand-hover);
+    color: var(--color-text-inverse);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn--secondary {
+    background: transparent;
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+
+  .btn--secondary:hover:not(.btn--disabled) {
+    background: var(--color-bg-hover);
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--color-text);
+    border-color: transparent;
+  }
+
+  .btn--ghost:hover:not(.btn--disabled) {
+    background: var(--color-bg-hover);
+    color: var(--color-brand);
+  }
+
+  .btn--danger {
+    background: var(--color-error);
+    color: var(--color-text-inverse);
+    border-color: var(--color-error);
+  }
+
+  .btn--danger:hover:not(.btn--disabled) {
+    background: #c0392b;
+    border-color: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+</style>

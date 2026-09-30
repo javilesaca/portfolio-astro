@@ -1,0 +1,110 @@
+---
+/**
+ * Footer — JaviLesacaPro Portfolio
+ * Site info, social links, copyright.
+ */
+---
+<footer class="footer" role="contentinfo">
+  <div class="footer__inner container">
+    <div class="footer__main">
+      <p class="footer__tagline">Building software with <span aria-hidden="true">♥</span> from Jaén to the world.</p>
+      <p class="footer__copy">© {new Date().getFullYear()} JaviLesacaPro by Javier Lesaca.</p>
+    </div>
+
+    <nav class="footer__social" aria-label="Redes sociales">
+      <ul class="footer__social-list" role="list">
+        <li>
+          <a href="https://github.com/javilesaca" class="footer__social-link" aria-label="GitHub - javilesaca" target="_blank" rel="noopener noreferrer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://linkedin.com/in/javilesacapro" class="footer__social-link" aria-label="LinkedIn - Javier Lesaca" target="_blank" rel="noopener noreferrer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+              <rect x="2" y="9" width="4" height="12" />
+              <circle cx="4" cy="4" r="2" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="mailto:javilesaca@javilesaca.pro" class="footer__social-link" aria-label="Email - javilesaca@javilesaca.pro">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-elevated);
+    padding-block: var(--space-10);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    text-align: center;
+  }
+
+  .footer__tagline {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .footer__copy {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: var(--space-2) 0 0;
+  }
+
+  .footer__social-list {
+    display: flex;
+    gap: var(--space-4);
+    list-style: none;
+  }
+
+  .footer__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    transition: color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
+  }
+
+  .footer__social-link:hover {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+    background: var(--color-brand-muted);
+    text-decoration: none;
+  }
+
+  .footer__social-link:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  @media (min-width: 48rem) {
+    .footer__inner {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+</style>

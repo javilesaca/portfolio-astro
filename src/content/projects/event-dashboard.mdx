@@ -1,0 +1,32 @@
+---
+title: "Panel de Eventos (EventDashboard)"
+description: "Dashboard administrativo para gestión de eventos en tiempo real. Backend con SignalR para actualizaciones live, panel de métricas, exportación CSV/PDF y sistema de notificaciones."
+shortDescription: "Dashboard temps real para gestión de eventos con SignalR y métricas avanzadas."
+techStack: ["ASP.NET Core", "C#", "SignalR", "PostgreSQL", "Entity Framework Core", "Blazor", "Chart.js", "Docker"]
+role: "Backend"
+status: "completed"
+featured: true
+startDate: "2024-03-10"
+endDate: "2024-06-30"
+repoUrl: "https://github.com/javilesaca/EventDashboard"
+demoUrl: "https://eventdashboard-demo.azurewebsites.net"
+image: "/EventDashboard.jpeg"
+imageAlt: "Dashboard de EventDashboard mostrando gráficos de asistencias en tiempo real, mapa de calor y lista de eventos"
+challenges:
+  - "Escalabilidad de conexiones WebSocket (SignalR) para 10k+ concurrentes"
+  - "Consistencia eventual entre PostgreSQL y cache Redis para métricas live"
+  - "Autorización granular por roles y organizaciones (policy-based)"
+  - "Exportación streaming de grandes datasets sin bloquear hilo principal"
+learnings:
+  - "Arquitectura de microservicios con API Gateway (YARP)"
+  - "Patrón CQRS para separación lectura/escritura en dashboards"
+  - "OpenTelemetry + Grafana para observabilidad distribuida"
+  - "CI/CD con GitHub Actions + Azure Container Apps"
+metrics:
+  - label: "Conexiones concurrentes"
+    value: "10k+"
+  - label: "Latencia p99"
+    value: "< 50ms"
+  - label: "Uptime SLA"
+    value: "99.9%"
+---

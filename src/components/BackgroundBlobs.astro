@@ -1,0 +1,72 @@
+---
+/**
+ * BackgroundBlobs — réplica fiel del fondo original (.circulos).
+ * Capa 1 (blur): 4 SVGs orgánicos al 55% en esquinas, scale(2)
+ * rotando (fondo 100s + cada blob 40s), blur(80px).
+ * Capa 2 (nítida): velo oscuro encima, como el .main original.
+ * Decorativo: aria-hidden. Respeta prefers-reduced-motion.
+ */
+import paths from '../data/blobPaths.ts';
+const fills = ['rgb(46, 139, 87)', 'rgb(134, 67, 179)', 'rgb(163, 108, 6)', 'rgb(24, 96, 145)'];
+const positions = ['circulo1', 'circulo2', 'circulo3', 'circulo4'];
+---
+<div class="fondo" aria-hidden="true">
+  <div class="circulos">
+    {paths.map((d, i) => (
+      <svg class={`circulo ${positions[i]}`} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path d={d} transform="translate(100 100)" fill={fills[i]} />
+      </svg>
+    ))}
+  </div>
+  <div class="velo"></div>
+</div>
+
+<style>
+  .fondo {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-bg);
+    overflow: hidden;
+    pointer-events: none;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .circulos {
+    position: absolute;
+    inset: 0;
+    filter: blur(80px);
+    animation: circulo1 100s linear infinite both;
+  }
+
+  .circulos .circulo {
+    position: absolute;
+    width: 55%;
+    height: 55%;
+    animation: circulo1 40s linear infinite both;
+  }
+
+  .circulos .circulo1 { top: 0%; left: 0%; }
+  .circulos .circulo2 { top: 0%; right: 0%; }
+  .circulos .circulo3 { bottom: 0%; left: 0%; }
+  .circulos .circulo4 { bottom: 0%; right: 0%; }
+
+  /* Velo NÍTIDO encima (equivale al .main original) */
+  .velo {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  :global(:root[data-theme="light"]) .velo {
+    background: rgba(250, 250, 250, 0.6);
+  }
+
+  @keyframes circulo1 {
+    from { transform: rotate(0deg) scale(2); }
+    to { transform: rotate(360deg) scale(2); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .circulos, .circulos .circulo { animation: none; }
+  }
+</style>

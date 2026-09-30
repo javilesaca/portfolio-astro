@@ -1,0 +1,82 @@
+/**
+ * Content Collections Config — JaviLesacaPro Portfolio
+ * Defines schema, validation, and TypeScript types for all content.
+ * Uses Zod for runtime validation + inferred TS types.
+ */
+
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'zod';
+
+/* ============================================================
+ * PROJECTS COLLECTION
+ * ============================================================ */
+const projects = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
+  schema: z.object({
+    title: z.string().max(100),
+    description: z.string().max(500),
+    shortDescription: z.string().max(200),
+    techStack: z.array(z.string()).min(1).max(10),
+    role: z.enum(['Backend', 'Frontend', 'Fullstack', 'DevOps', 'Mobile']),
+    status: z.enum(['completed', 'in-progress', 'archived']).default('completed'),
+    featured: z.boolean().default(false),
+    startDate: z.string().date(),           // ISO date string
+    endDate: z.string().date().optional(),
+    repoUrl: z.string().url(),
+    demoUrl: z.string().url().optional(),
+    image: z.string(),                      // path relative to public/ or import path
+    imageAlt: z.string().min(10).max(150),
+    challenges: z.array(z.string()).min(1).max(6),
+    learnings: z.array(z.string()).min(1).max(6),
+    metrics: z.array(z.object({
+      label: z.string(),
+      value: z.string(),
+    })).optional(),
+  }),
+});
+
+/* ============================================================
+ * BLOG COLLECTION (future)
+ * ============================================================ */
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string().max(120),
+    description: z.string().max(300),
+    publishDate: z.string().date(),
+    updateDate: z.string().date().optional(),
+    tags: z.array(z.string()).default([]),
+    featured: z.boolean().default(false),
+    draft: z.boolean().default(false),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
+    readingTime: z.string().optional(),
+  }),
+});
+
+/* ============================================================
+ * EXPORTS
+ * ============================================================ */
+export const collections = { projects, blog };
+
+/* ============================================================
+ * TYPE HELPERS — Infer types from schemas
+ * ============================================================ */
+export type ProjectEntry = typeof projects.schema;
+export type BlogEntry = typeof blog.schema;
+
+// Type for getCollection() results
+export interface ProjectData {
+  id: string;
+  slug: string;
+  data: z.infer<ProjectEntry>;
+  body: string;
+}
+
+export interface BlogData {
+  id: string;
+  slug: string;
+  data: z.infer<BlogEntry>;
+  body: string;
+}
