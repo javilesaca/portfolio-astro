@@ -4,6 +4,7 @@
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import type { Lang } from '../i18n';
 interface Props {
   title: string;
   shortDescription: string;
@@ -14,24 +15,27 @@ interface Props {
   repoUrl: string;
   demoUrl?: string;
   slug: string;
+  lang?: Lang;
 }
 import TechBadge from './TechBadge.astro';
-const { title, shortDescription, techStack, role, image, imageAlt, repoUrl, demoUrl, slug } = Astro.props;
+import type { Lang } from '../i18n';
+const { title, shortDescription, techStack, role, image, imageAlt, repoUrl, demoUrl, slug, lang = 'es' } = Astro.props as Props & { lang?: Lang };
+const base = lang === 'en' ? '/en/projects' : '/proyectos';
 ---
 <article class="card">
-  <a href={`/proyectos/${slug}/`} class="card__media" aria-label={`Ver detalle de ${title}`}>
+  <a href={`${base}/${slug}/`} class="card__media" aria-label={`Ver detalle de ${title}`}>
     <Image src={image} alt={imageAlt} width={800} formats={['avif', 'webp']} loading="lazy" decoding="async" class="card__img" />
   </a>
   <div class="card__body">
     <p class="card__role">{role}</p>
-    <h3 class="card__title"><a href={`/proyectos/${slug}/`}>{title}</a></h3>
+    <h3 class="card__title"><a href={`${base}/${slug}/`}>{title}</a></h3>
     <p class="card__desc">{shortDescription}</p>
     <ul class="card__tags" aria-label="Tecnologías">
       {techStack.slice(0, 4).map((t) => <li><TechBadge name={t} /></li>)}
       {techStack.length > 4 && <li class="card__more" aria-label={`Más tecnologías: ${techStack.slice(4).join(', ')}`}>+{techStack.length - 4}</li>}
     </ul>
     <div class="card__actions">
-      <a href={`/proyectos/${slug}/`} class="card__link">Case study →</a>
+      <a href={`${base}/${slug}/`} class="card__link">Case study →</a>
       <a href={repoUrl} class="card__link card__link--muted" target="_blank" rel="noopener noreferrer">Repo ↗</a>
       {demoUrl && <a href={demoUrl} class="card__link card__link--muted" target="_blank" rel="noopener noreferrer">Demo ↗</a>}
     </div>
