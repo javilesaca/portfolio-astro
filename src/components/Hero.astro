@@ -118,10 +118,6 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
       width: 100%;
     }
 
-    .hero__title {
-      font-size: clamp(0.72rem, 3.7vw, 1rem);
-      letter-spacing: 0;
-    }
 
     .hero__photo img {
       width: 11rem;
@@ -203,6 +199,14 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
   .hero__social-link:focus-visible {
     outline: none;
     box-shadow: var(--shadow-focus);
+  }
+
+  /* Mobile title: single line that always fits (placed last to win the cascade) */
+  @media (max-width: 48rem) {
+    .hero__inner .hero__content .hero__title {
+      font-size: 3.7vw;
+      letter-spacing: 0;
+    }
   }
 
 </style>
