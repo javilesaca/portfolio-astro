@@ -1,0 +1,26 @@
+---
+import { langs, langNames, type Lang } from '../i18n';
+interface Props { lang?: Lang; currentPath?: string }
+const { lang = 'es', currentPath = '/' } = Astro.props as Props;
+// Map current path across languages: strip existing /xx prefix
+const suffix = currentPath.replace(/^\/(en|fr|de|pt|it)(?=\/|$)/, '') || '/';
+const hrefFor = (l: Lang) => (l === 'es' ? (suffix === '/' ? '/' : suffix) : `/${l}${suffix === '/' ? '/' : suffix}`);
+---
+<details class="langsel">
+  <summary class="langsel__btn" aria-label="Idioma / Language">{lang.toUpperCase()} <span aria-hidden="true">▾</span></summary>
+  <ul class="langsel__menu" role="list">
+    {langs.map((l) => (
+      <li><a href={hrefFor(l)} class="langsel__link" aria-current={l === lang ? 'true' : undefined} hreflang={l}>{langNames[l]}</a></li>
+    ))}
+  </ul>
+</details>
+<style>
+.langsel{position:relative;margin-left:var(--space-4)}
+.langsel__btn{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.25rem;font-size:var(--text-sm);font-weight:var(--font-weight-medium);color:var(--color-text-muted);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:.4rem .6rem;background:transparent}
+.langsel__btn::-webkit-details-marker{display:none}
+.langsel__btn:hover{color:var(--color-brand);border-color:var(--color-brand)}
+.langsel__menu{position:absolute;right:0;top:calc(100% + 8px);min-width:10rem;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);list-style:none;padding:.25rem;z-index:var(--z-dropdown)}
+.langsel__link{display:block;padding:.5rem .75rem;border-radius:var(--radius-sm);color:var(--color-text);font-size:var(--text-sm);text-decoration:none}
+.langsel__link:hover{background:var(--color-brand-muted);color:var(--color-brand);text-decoration:none}
+.langsel__link[aria-current="true"]{color:var(--color-brand);font-weight:var(--font-weight-semibold)}
+</style>

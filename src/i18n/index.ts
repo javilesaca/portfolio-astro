@@ -1,6 +1,13 @@
 import { es } from "./es";
 import { en } from "./en";
-export type Lang = "es" | "en";
-export const dicts = { es, en } as const;
+import { fr } from "./fr";
+import { de } from "./de";
+import { pt } from "./pt";
+import { it } from "./it";
+export type Lang = "es" | "en" | "fr" | "de" | "pt" | "it";
+export const langs: Lang[] = ["es", "en", "fr", "de", "pt", "it"];
+export const langNames: Record<Lang, string> = { es: "Español", en: "English", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano" };
+export const dicts = { es, en, fr, de, pt, it } as const;
 export const getDict = (lang: Lang) => dicts[lang];
-export const isLang = (v: unknown): v is Lang => v === "es" || v === "en";
+export const isLang = (v: unknown): v is Lang => (v as string) in dicts;
+export const langPath = (lang: Lang, path = "/") => (lang === "es" ? path : `/${lang}${path === "/" ? "/" : path}`);
