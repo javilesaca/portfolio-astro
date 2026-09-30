@@ -63,6 +63,31 @@ const projects_en = defineCollection({
   }),
 });
 
+const projects_it = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/projects_it' }),
+  schema: ({ image }) => z.object({
+    title: z.string().max(100),
+    description: z.string().max(500),
+    shortDescription: z.string().max(200),
+    techStack: z.array(z.string()).min(1).max(10),
+    role: z.enum(['Backend', 'Frontend', 'Fullstack', 'DevOps', 'Mobile']),
+    status: z.enum(['completed', 'in-progress', 'archived']).default('completed'),
+    featured: z.boolean().default(false),
+    startDate: z.string().date(),
+    endDate: z.string().date().optional(),
+    repoUrl: z.string().url(),
+    demoUrl: z.string().url().optional(),
+    image: image(),
+    imageAlt: z.string().min(10).max(150),
+    challenges: z.array(z.string()).min(1).max(6),
+    learnings: z.array(z.string()).min(1).max(6),
+    metrics: z.array(z.object({
+      label: z.string(),
+      value: z.string(),
+    })).optional(),
+  }),
+});
+
 const projects_pt = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/projects_pt' }),
   schema: ({ image }) => z.object({
@@ -160,7 +185,7 @@ const blog = defineCollection({
 /* ============================================================
  * EXPORTS
  * ============================================================ */
-export const collections = { projects, projects_en, projects_fr, projects_de, projects_pt, blog };
+export const collections = { projects, projects_en, projects_fr, projects_de, projects_pt, projects_it, blog };
 
 /* ============================================================
  * TYPE HELPERS — Infer types from schemas

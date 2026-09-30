@@ -1,0 +1,41 @@
+---
+title: "Agente Gamer"
+description: "Assistente finanziario intelligente su Android per spese e acquisti di giochi. Budget mensile, raccomandazioni personalizzate, catalogo via RAWG API, wishlist, uscite e sync cloud con Firebase."
+shortDescription: "App Android per il tuo budget gamer: spese, raccomandazioni, catalogo RAWG e wishlist."
+techStack: ["Java", "Android SDK", "Firebase", "Room", "Retrofit", "RAWG API", "Firestore", "WorkManager", "Dagger Hilt", "MPAndroidChart"]
+role: "Mobile"
+status: "completed"
+featured: true
+startDate: "2026-03-30"
+endDate: "2026-04-30"
+repoUrl: "https://github.com/javilesaca/AgenteGamer_APP"
+image: "../../assets/AgenteGamer.png"
+imageAlt: "Illustrazione Agente Gamer: smartphone con dashboard finanziaria, controller, portafoglio euro e wishlist"
+challenges:
+  - "Sync offline-first tra Room locale e Firestore senza duplicati"
+  - "Precaricamento nello splash per un avvio fluido"
+  - "Paginazione e ricerca efficienti sulla RAWG API con Retrofit"
+  - "Notifiche budget intelligenti con WorkManager"
+learnings:
+  - "MVVM + Clean Architecture con dependency injection (Hilt)"
+  - "Persistenza reattiva con Room e LiveData"
+  - "Autenticazione e sync cloud con Firebase"
+  - "Visualizzazione dati mobile con MPAndroidChart"
+metrics:
+  - label: "Schermate"
+    value: "7"
+  - label: "Sync"
+    value: "Tempo reale"
+  - label: "Licenza"
+    value: "MIT"
+---
+
+## Contesto
+
+Agente Gamer nasce da un bisogno reale: i giocatori comprano su più piattaforme e perdono il conto della spesa mensile. La app unisce spese, budget e scoperta di giochi.
+
+## Decisioni tecniche
+
+- **Offline-first**: Room come fonte locale e Firestore come backup cloud.
+- **RAWG API** per il catalogo: paginazione in griglia a 2 colonne con dettaglio in dialogo.
+- **WorkManager** para alertas de presupuesto sin necesidad de abrir la app.
