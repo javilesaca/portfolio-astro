@@ -28,7 +28,7 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
     </div>
     <div class="hero__content">
       <h1 id="hero-title" class="hero__name">{name}</h1>
-      <p class="hero__title">{title}</p>
+      <p class="hero__title"><svg viewBox="0 0 390 26" role="img" aria-label={title} aria-hidden="false"><text x="195" y="19" text-anchor="middle" textLength="382" lengthAdjust="spacingAndGlyphs">{title}</text></svg></p>
       <p class="hero__description">{description}</p>
 
       <div class="hero__actions" role="group" aria-label="Acciones principales">
@@ -139,12 +139,21 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
   }
 
   .hero__title {
-    font-size: clamp(1rem, 1rem + 1.5vw, var(--text-2xl));
-    white-space: nowrap;
-    font-family: var(--font-sans);
-    font-weight: var(--font-weight-medium);
     color: var(--color-brand);
     margin-bottom: var(--space-4);
+  }
+
+  .hero__title svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .hero__title text {
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-medium);
+    font-size: 20px;
+    fill: currentColor;
   }
 
   .hero__description {
@@ -199,14 +208,6 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
   .hero__social-link:focus-visible {
     outline: none;
     box-shadow: var(--shadow-focus);
-  }
-
-  /* Mobile title: single line that always fits (placed last to win the cascade) */
-  @media (max-width: 48rem) {
-    .hero__inner .hero__content .hero__title {
-      font-size: 3.7vw;
-      letter-spacing: 0;
-    }
   }
 
 </style>
