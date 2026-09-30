@@ -13,7 +13,7 @@ import { z } from 'zod';
  * ============================================================ */
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string().max(100),
     description: z.string().max(500),
     shortDescription: z.string().max(200),
@@ -25,7 +25,7 @@ const projects = defineCollection({
     endDate: z.string().date().optional(),
     repoUrl: z.string().url(),
     demoUrl: z.string().url().optional(),
-    image: z.string(),                      // path relative to public/ or import path
+    image: image(),                          // optimized via astro:assets
     imageAlt: z.string().min(10).max(150),
     challenges: z.array(z.string()).min(1).max(6),
     learnings: z.array(z.string()).min(1).max(6),

@@ -2,12 +2,14 @@
 /**
  * ProjectCard — card accesible para la grid de proyectos.
  */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 interface Props {
   title: string;
   shortDescription: string;
   techStack: string[];
   role: string;
-  image: string;
+  image: ImageMetadata;
   imageAlt: string;
   repoUrl: string;
   demoUrl?: string;
@@ -18,7 +20,7 @@ const { title, shortDescription, techStack, role, image, imageAlt, repoUrl, demo
 ---
 <article class="card">
   <a href={`/proyectos/${slug}/`} class="card__media" aria-label={`Ver detalle de ${title}`}>
-    <img src={image} alt={imageAlt} loading="lazy" decoding="async" class="card__img" />
+    <Image src={image} alt={imageAlt} width={800} formats={['avif', 'webp']} loading="lazy" decoding="async" class="card__img" />
   </a>
   <div class="card__body">
     <p class="card__role">{role}</p>

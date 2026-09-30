@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -11,14 +12,14 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { Content } = await render(project);
 ---
-<BaseLayout title={`${project.data.title} — Case study`} description={project.data.description} ogImage={project.data.image}>
+<BaseLayout title={`${project.data.title} — Case study`} description={project.data.description} ogImage={project.data.image.src}>
   <Header slot="header" />
   <article class="section container container--narrow">
     <a href="/#proyectos">← Volver a proyectos</a>
     <p class="role">{project.data.role} · {project.data.status}</p>
     <h1>{project.data.title}</h1>
     <p class="lead">{project.data.description}</p>
-    <img src={project.data.image} alt={project.data.imageAlt} class="cover" />
+    <Image src={project.data.image} alt={project.data.imageAlt} width={1200} formats={['avif', 'webp']} class="cover" />
     <h2>Stack</h2>
     <ul class="tags">{project.data.techStack.map((t) => <li>{t}</li>)}</ul>
     <h2>Retos</h2>
