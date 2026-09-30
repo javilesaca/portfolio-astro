@@ -155,6 +155,28 @@ const classes = [
     color: var(--color-brand);
   }
 
+  /* Light theme only: match global secondary (icon gray + header-like hover) */
+  :global(:root[data-theme="light"]) .btn--secondary {
+    color: var(--color-text-muted);
+    border-color: var(--color-text-muted);
+  }
+  :global(:root[data-theme="light"]) .btn--secondary:hover:not(.btn--disabled) {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+    background: var(--color-brand-muted);
+  }
+  @media (prefers-color-scheme: light) {
+    :global(:root:not([data-theme="dark"])) .btn--secondary {
+      color: var(--color-text-muted);
+      border-color: var(--color-text-muted);
+    }
+    :global(:root:not([data-theme="dark"])) .btn--secondary:hover:not(.btn--disabled) {
+      color: var(--color-brand);
+      border-color: var(--color-brand);
+      background: var(--color-brand-muted);
+    }
+  }
+
   .btn--ghost {
     background: transparent;
     color: var(--color-text);
