@@ -27,7 +27,7 @@ jobs:
         if: env.LINGO_API_KEY != ''
         run: |
           npm install -g @lingo.dev/cli
-          lingo push --config .lingo/config.json
+          lingo push --wait
       - name: DeepL fallback
         if: >
           env.LINGO_API_KEY == '' &&
