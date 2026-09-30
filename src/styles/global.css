@@ -283,6 +283,11 @@ transition:all var(--duration-fast) var(--ease-out);white-space:nowrap;user-sele
 .btn--primary:hover{background:var(--color-brand-hover);border-color:var(--color-brand-hover);color:var(--color-text-inverse);transform:translateY(-1px);box-shadow:var(--shadow-md);text-decoration:none}
 .btn--secondary{background:transparent;color:var(--color-text);border-color:var(--color-border)}
 .btn--secondary:hover{background:var(--color-bg-hover);border-color:var(--color-brand);color:var(--color-brand);text-decoration:none}
+/* Light theme only: secondary buttons match the icon gray (border + text) */
+:root[data-theme="light"] .btn--secondary{color:var(--color-text-muted);border-color:var(--color-text-muted)}
+:root[data-theme="light"] .btn--secondary:hover{color:var(--color-brand);border-color:var(--color-brand);background:var(--color-brand-muted);text-decoration:none}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .btn--secondary{color:var(--color-text-muted);border-color:var(--color-text-muted)}
+:root:not([data-theme="dark"]) .btn--secondary:hover{color:var(--color-brand);border-color:var(--color-brand);background:var(--color-brand-muted);text-decoration:none}}
 .btn:disabled{opacity:.6;cursor:wait}
 
 /* Form status message */
