@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Hero from '../../components/Hero.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+import { getDict } from "../../i18n";
+const lang = "pt" as const;
+const d = getDict(lang);
+
+const projects = (await getCollection('projects')).sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
+---
+<BaseLayout lang={lang} title="Javier Lesaca — IT Infrastructure & Software Developer" description="Javier Lesaca portfolio, IT Infrastructure & Software Developer. Infrastructure, software, automation and AI.">
+  <Header slot="header" lang={lang} />
+  <Hero lang={lang} title={d.hero.title} description={d.hero.description} />
+  <section id="proyectos" class="section" aria-labelledby="proyectos-title">
+    <div class="container">
+      <h2 id="proyectos-title">{d.sections.projects}</h2>
+      <p class="lead">Projetos selecionados com case studies: contexto, desafios técnicos e aprendizados.</p>
+      <div class="grid">
+        {projects.map((p) => (
+          <ProjectCard lang={lang} title={p.data.title} shortDescription={p.data.shortDescription} techStack={p.data.techStack} role={p.data.role} image={p.data.image} imageAlt={p.data.imageAlt} repoUrl={p.data.repoUrl} demoUrl={p.data.demoUrl} slug={p.id.replace(/\.mdx?$/,"")} />
+        ))}
+      </div>
+    </div>
+  </section>
+  <section id="sobre-mi" class="section" aria-labelledby="sobre-title">
+    <div class="container container--narrow">
+      <h2 id="sobre-title">{d.sections.about}</h2>
+      <p>I'm a technology professional with a career built from IT infrastructure — systems, networks, servers and security — to software development, automation and applied AI. I combine technical experience with business vision to turn business needs into technology solutions.</p>
+      <p>I have worked in infrastructure administration and optimization, business continuity, support and technology consulting, including deployment projects for organizations and public administrations. Today I complement that profile with multiplatform development, working with Java, C#, Python, SQL/NoSQL, Spring Boot and Git, plus generative AI, automation and autonomous agents.</p>
+      <p>I look for roles that bring both worlds together: IT infrastructure and operations with software, automation and AI — creating, integrating and modernizing solutions.</p>
+      <ul class="areas" aria-label="Areas of expertise">
+        <li>Infraestrutura & Redes</li>
+        <li>Desenvolvimento de Software</li>
+        <li>Automação</li>
+        <li>IA aplicada & Agentes</li>
+      </ul>
+    </div>
+  </section>
+  <section id="contacto" class="section" aria-labelledby="contacto-title">
+    <div class="container container--narrow">
+      <h2 id="contacto-title">{d.sections.contact}</h2>
+      <p class="lead">Tem uma proposta ou quer o meu currículo? Escreva-me.</p>
+      <form name="contacto" method="POST" action="https://formspree.io/f/mppwbnon" class="form">
+        <p class="visually-hidden"><label>No rellenar: <input name="_gotcha" tabindex="-1" autocomplete="off" /></label></p>
+        <input type="hidden" name="_subject" value="Nuevo mensaje desde el portfolio" />
+        <label for="nombre">Nome<input id="nombre" name="nombre" required autocomplete="name" /></label>
+        <label for="email">Email<input id="email" name="email" type="email" required autocomplete="email" /></label>
+        <label for="mensaje">Mensagem<textarea id="mensaje" name="mensaje" rows="5" required></textarea></label>
+        <button class="btn btn--primary btn--md" type="submit">Enviar mensagem</button>
+        <p class="form__status" data-form-status role="status" aria-live="polite" hidden></p>
+      </form>
+      <script>
+        const form = document.querySelector('form[name="contacto"]');
+        const status = document.querySelector('[data-form-status]');
+        form?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!form || !status) return;
+          const btn = form.querySelector('button[type="submit"]');
+          status.hidden = false;
+          status.textContent = 'Sending…';
+          if (btn instanceof HTMLButtonElement) btn.disabled = true;
+          try {
+            const res = await fetch(form.action, {
+              method: 'POST',
+              body: new FormData(form),
+              headers: { Accept: 'application/json' },
+            });
+            if (!res.ok) throw new Error('send failed');
+            form.reset();
+            status.textContent = 'Message sent! I will reply as soon as possible.';
+          } catch {
+            status.textContent = 'Could not send. Write to me at javilesaca@javilesaca.pro';
+          } finally {
+            if (btn instanceof HTMLButtonElement) btn.disabled = false;
+          }
+        });
+      </script>
+      <p class="alt">Ou por email: <a href="mailto:javilesaca@javilesaca.pro">javilesaca@javilesaca.pro</a></p>
+    </div>
+  </section>
+  <Footer slot="footer" />
+</BaseLayout>
+<style>
+.lead{color:var(--color-text-muted);font-size:var(--text-lg);margin:.5rem 0 2rem}
+.container--narrow{max-width:var(--container-md)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:var(--space-6);margin-top:var(--space-8)}
+.form{display:grid;gap:var(--space-4);margin-top:var(--space-6);text-align:left}
+.form label{display:grid;gap:var(--space-2)}
+.section h2{margin-bottom:var(--space-8)}
+.alt{margin-top:var(--space-4);color:var(--color-text-muted)}
+.areas{display:flex;flex-wrap:wrap;gap:var(--space-2);list-style:none;margin:var(--space-6) 0 0;padding:0;justify-content:center}
+.areas li{font-size:var(--text-sm);font-weight:var(--font-weight-medium);border:1px solid currentColor;border-radius:var(--radius-full);padding:var(--space-2) var(--space-4);color:var(--color-text)}
+</style>
