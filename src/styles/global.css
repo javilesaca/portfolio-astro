@@ -20,6 +20,7 @@
 }
 
 html {
+  overflow-x: clip;
   font-size: 100%;           /* 16px base */
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;

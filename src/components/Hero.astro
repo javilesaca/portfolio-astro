@@ -83,6 +83,8 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
     align-items: center;
     justify-content: center;
     gap: var(--space-12);
+    max-width: 100%;
+    overflow-x: clip;
   }
 
   .hero__content {
@@ -117,7 +119,8 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
     }
 
     .hero__title {
-      font-size: clamp(0.8rem, 4vw, 1rem);
+      font-size: clamp(0.72rem, 3.7vw, 1rem);
+      letter-spacing: 0;
     }
 
     .hero__photo img {
