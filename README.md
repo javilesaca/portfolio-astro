@@ -41,3 +41,12 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Multilingual AI pipeline (recruiter case study)
+
+This portfolio ships in 6 languages (ES, EN, FR, DE, PT, IT) with a professional i18n setup:
+
+- **Routing:** `/` (ES default) + `/en/`, `/fr/`, `/de/`, `/pt/`, `/it/` with `hreflang` es/en/fr/de/pt/it/x-default and x2–x6 sitemap coverage.
+- **Architecture:** typed dictionaries in `src/i18n/` (`getDict(lang)`), `lang` prop on Header/Hero/ProjectCard, `LangSelector.astro` dropdown with cross-language path mapping.
+- **AI-assisted translation:** UI strings and page bodies generated with an LLM agent workflow (glossary: product names, tech stack and "case study" stay untranslated; brand voice preserved per locale), then human-reviewed commit by commit.
+- **Next step:** wire a translation-memory CI (e.g. `ai-i18n-tools` or Lingo.dev engine with GEMBA scoring) so every ES change opens an auto-translation PR with preview instead of manual sync.
