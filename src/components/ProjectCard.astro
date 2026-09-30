@@ -20,7 +20,7 @@ interface Props {
 import TechBadge from './TechBadge.astro';
 import type { Lang } from '../i18n';
 const { title, shortDescription, techStack, role, image, imageAlt, repoUrl, demoUrl, slug, lang = 'es' } = Astro.props as Props & { lang?: Lang };
-const base = lang === 'en' ? '/en/projects' : '/proyectos';
+const base = lang === 'es' ? '/proyectos' : `/${lang}/projects`;
 ---
 <article class="card">
   <a href={`${base}/${slug}/`} class="card__media" aria-label={`Ver detalle de ${title}`}>
