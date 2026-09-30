@@ -4,6 +4,11 @@
  * Semantic navigation with logo, nav links, mobile menu button.
  * Accessible: keyboard navigation, ARIA labels, focus management.
  */
+import type { Lang } from '../i18n';
+import { getDict } from '../i18n';
+interface Props { lang?: Lang }
+const { lang = 'es' } = Astro.props as Props;
+const d = getDict(lang);
 ---
 <header class="header" role="banner">
   <div class="header__inner container">
@@ -32,10 +37,10 @@
       </button>
 
       <ul id="header-menu" class="header__menu" role="list">
-        <li><a href="#inicio" class="header__link">Inicio</a></li>
-        <li><a href="#proyectos" class="header__link">Proyectos</a></li>
-        <li><a href="#sobre-mi" class="header__link">Sobre mí</a></li>
-        <li><a href="#contacto" class="header__link header__link--cta">Contacto</a></li>
+        <li><a href="#inicio" class="header__link">{d.header.home}</a></li>
+        <li><a href="#proyectos" class="header__link">{d.header.projects}</a></li>
+        <li><a href="#sobre-mi" class="header__link">{d.header.about}</a></li>
+        <li><a href="#contacto" class="header__link header__link--cta">{d.header.contact}</a></li>
       </ul>
 
       <button

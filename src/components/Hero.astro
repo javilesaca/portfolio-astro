@@ -4,14 +4,18 @@
  * Hero section with name, title, CTAs, social links.
  * Semantic, accessible, responsive.
  */
+import type { Lang } from '../i18n';
+import { getDict } from '../i18n';
 interface Props {
   name?: string;
   title?: string;
   description?: string;
+  lang?: Lang;
 }
 import { Image } from 'astro:assets';
 import perfilSrc from '../assets/perfil.png';
-const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer', description = 'Infraestructura IT, desarrollo de software, automatización e IA aplicada. Del sistema al código: soluciones robustas y modernas.' } = Astro.props;
+const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer', description = 'Infraestructura IT, desarrollo de software, automatización e IA aplicada. Del sistema al código: soluciones robustas y modernas.', lang = 'es' } = Astro.props;
+const d = getDict(lang);
 ---
 <section id="inicio" class="hero" aria-labelledby="hero-title">
   <div class="hero__inner container">
@@ -32,8 +36,8 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
       <p class="hero__description">{description}</p>
 
       <div class="hero__actions" role="group" aria-label="Acciones principales">
-        <a href="#proyectos" class="btn btn--sm btn--secondary">Ver proyectos</a>
-        <a href="#contacto" class="btn btn--sm btn--secondary">Contactar</a>
+        <a href="#proyectos" class="btn btn--sm btn--secondary">{d.hero.projects}</a>
+        <a href="#contacto" class="btn btn--sm btn--secondary">{d.hero.contact}</a>
       </div>
 
       <nav class="hero__social" aria-label="Perfiles profesionales">
