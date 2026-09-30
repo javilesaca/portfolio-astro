@@ -133,7 +133,8 @@ const { name = 'Javier Lesaca', title = 'IT Infrastructure & Software Developer'
   }
 
   .hero__title {
-    font-size: var(--text-2xl);
+    font-size: clamp(1rem, 1rem + 1.5vw, var(--text-2xl));
+    white-space: nowrap;
     font-family: var(--font-sans);
     font-weight: var(--font-weight-medium);
     color: var(--color-brand);
