@@ -29,8 +29,8 @@ const projects = (await getCollection('projects_fr')).sort((a, b) => Number(b.da
     <div class="container container--narrow">
       <h2 id="sobre-title">{d.sections.about}</h2>
       <p>I'm a technology professional with a career built from IT infrastructure — systems, networks, servers and security — to software development, automation and applied AI. I combine technical experience with business vision to turn business needs into technology solutions.</p>
-      <p>I have worked in infrastructure administration and optimization, business continuity, support and technology consulting, including deployment projects for organizations and public administrations. Today I complement that profile with multiplatform development, working with Java, C#, Python, SQL/NoSQL, Spring Boot and Git, plus generative AI, automation and autonomous agents.</p>
-      <p>I look for roles that bring both worlds together: IT infrastructure and operations with software, automation and AI — creating, integrating and modernizing solutions.</p>
+      <p>J'ai travaillé dans l'administration et l'optimisation d'infrastructures, la continuité d'activité, le support et le conseil technologique, y compris des projets de déploiement pour des organisations et administrations publiques. Aujourd'hui je complète ce profil avec le développement multiplateforme : Java, C#, Python, SQL/NoSQL, Spring Boot et Git, plus IA générative, automatisation et agents autonomes.</p>
+      <p>Je cherche des postes qui relient ces deux mondes : infrastructure et opérations IT avec logiciel, automatisation et IA — créer, intégrer et moderniser des solutions.</p>
       <ul class="areas" aria-label="Domaines expertise">
         <li>Infrastructure & Réseaux</li>
         <li>Développement logiciel</li>
@@ -70,9 +70,9 @@ const projects = (await getCollection('projects_fr')).sort((a, b) => Number(b.da
             });
             if (!res.ok) throw new Error('send failed');
             form.reset();
-            status.textContent = 'Message sent! I will reply as soon as possible.';
+            status.textContent = 'Message envoyé ! Je répondrai dès que possible.';
           } catch {
-            status.textContent = 'Could not send. Write to me at javilesaca@javilesaca.pro';
+            status.textContent = 'Envoi impossible. Écrivez-moi à javilesaca@javilesaca.pro';
           } finally {
             if (btn instanceof HTMLButtonElement) btn.disabled = false;
           }

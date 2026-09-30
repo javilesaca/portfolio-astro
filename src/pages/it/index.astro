@@ -29,9 +29,9 @@ const projects = (await getCollection('projects_it')).sort((a, b) => Number(b.da
     <div class="container container--narrow">
       <h2 id="sobre-title">{d.sections.about}</h2>
       <p>I'm a technology professional with a career built from IT infrastructure — systems, networks, servers and security — to software development, automation and applied AI. I combine technical experience with business vision to turn business needs into technology solutions.</p>
-      <p>I have worked in infrastructure administration and optimization, business continuity, support and technology consulting, including deployment projects for organizations and public administrations. Today I complement that profile with multiplatform development, working with Java, C#, Python, SQL/NoSQL, Spring Boot and Git, plus generative AI, automation and autonomous agents.</p>
-      <p>I look for roles that bring both worlds together: IT infrastructure and operations with software, automation and AI — creating, integrating and modernizing solutions.</p>
-      <ul class="areas" aria-label="Areas of expertise">
+      <p>Ho lavorato in amministrazione e ottimizzazione di infrastrutture, business continuity, supporto e consulenza tecnologica, inclusi progetti di deployment per organizzazioni e pubbliche amministrazioni. Oggi completo il profilo con sviluppo multipiattaforma: Java, C#, Python, SQL/NoSQL, Spring Boot e Git, più IA generativa, automazione e agenti autonomi.</p>
+      <p>Cerco ruoli che uniscano questi due mondi: infrastruttura e operazioni IT con software, automazione e IA — creare, integrare e modernizzare soluzioni.</p>
+      <ul class="areas" aria-label="Aree di competenza">
         <li>Infrastruttura & Reti</li>
         <li>Sviluppo software</li>
         <li>Automazione</li>
@@ -60,7 +60,7 @@ const projects = (await getCollection('projects_it')).sort((a, b) => Number(b.da
           if (!form || !status) return;
           const btn = form.querySelector('button[type="submit"]');
           status.hidden = false;
-          status.textContent = 'Sending…';
+          status.textContent = 'Invio in corso…';
           if (btn instanceof HTMLButtonElement) btn.disabled = true;
           try {
             const res = await fetch(form.action, {
@@ -70,9 +70,9 @@ const projects = (await getCollection('projects_it')).sort((a, b) => Number(b.da
             });
             if (!res.ok) throw new Error('send failed');
             form.reset();
-            status.textContent = 'Message sent! I will reply as soon as possible.';
+            status.textContent = 'Messaggio inviato! Risponderò il prima possibile.';
           } catch {
-            status.textContent = 'Could not send. Write to me at javilesaca@javilesaca.pro';
+            status.textContent = 'Invio non riuscito. Scrivimi a javilesaca@javilesaca.pro';
           } finally {
             if (btn instanceof HTMLButtonElement) btn.disabled = false;
           }
