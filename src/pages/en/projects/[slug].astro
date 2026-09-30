@@ -6,7 +6,7 @@ import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
+  const projects = await getCollection('projects_en');
   return projects.map((p) => ({ params: { slug: p.id.replace(/\.mdx?$/,"") }, props: { project: p } }));
 }
 const lang = "en" as const;
