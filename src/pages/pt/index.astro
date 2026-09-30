@@ -9,7 +9,7 @@ import { getDict } from "../../i18n";
 const lang = "pt" as const;
 const d = getDict(lang);
 
-const projects = (await getCollection('projects')).sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
+const projects = (await getCollection('projects_pt')).sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
 ---
 <BaseLayout lang={lang} title="Javier Lesaca — IT Infrastructure & Software Developer" description="Javier Lesaca portfolio, IT Infrastructure & Software Developer. Infrastructure, software, automation and AI.">
   <Header slot="header" lang={lang} />
