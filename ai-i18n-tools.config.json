@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/ai-i18n-tools/schema.json",
+  "sourceLocale": "es",
+  "targetLocales": ["en", "fr", "de", "pt", "it"],
+  "providers": [{ "name": "default", "keyFromEnv": "I18N_PROVIDER_KEY" }],
+  "glossary": ["case study", "ProjectCard", "TechStack"],
+  "note": "Skeleton: tune contentPaths/docs blocks per https://github.com/wsj-br/ai-i18n-tools before first real sync. Manual curated translations in src/content/projects_<lang>/ take precedence."
+}
