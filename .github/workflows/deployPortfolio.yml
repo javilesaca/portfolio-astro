@@ -34,7 +34,9 @@ jobs:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        # FTP lands jailed at the docroot: mirror into ./ (./public_html/
+        # created a nested public_html/public_html/ black hole).
         run: |
           lftp -e "set ssl:verify-certificate no; \
-            mirror -R ./dist/ ./public_html/; quit" \
+            mirror -R ./dist/ ./; quit" \
             -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_SERVER"
