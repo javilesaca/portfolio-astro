@@ -31,29 +31,29 @@ const { expression = 'idle' } = Astro.props;
   <svg viewBox="0 0 200 160" aria-hidden="true">
     <defs>
       <!-- Rejilla de puntos luminosos (la "bombilla" del panel LED) -->
-      <pattern id="nova-dots" width="7" height="7" patternUnits="userSpaceOnUse">
-        <circle cx="3.5" cy="3.5" r="2.3" class="dot" />
+      <pattern id="nova-dots" width="6" height="6" patternUnits="userSpaceOnUse">
+        <circle cx="3" cy="3" r="1.15" class="dot" />
       </pattern>
 
       <!-- Ojos estilo EVA: óvalos alargados, inclinados hacia el centro -->
       <mask id="m-eyes-idle">
-        <ellipse cx="68" cy="66" rx="24" ry="34" transform="rotate(8 68 66)" fill="#fff" />
-        <ellipse cx="132" cy="66" rx="24" ry="34" transform="rotate(-8 132 66)" fill="#fff" />
+        <ellipse cx="70" cy="66" rx="17" ry="24" transform="rotate(8 70 66)" fill="#fff" />
+        <ellipse cx="130" cy="66" rx="17" ry="24" transform="rotate(-8 130 66)" fill="#fff" />
       </mask>
       <!-- Thinking: ojos entornados (rendijas de concentración) -->
       <mask id="m-eyes-thinking">
-        <ellipse cx="68" cy="68" rx="24" ry="12" transform="rotate(6 68 68)" fill="#fff" />
-        <ellipse cx="132" cy="68" rx="24" ry="12" transform="rotate(-6 132 68)" fill="#fff" />
+        <ellipse cx="70" cy="68" rx="17" ry="9" transform="rotate(6 70 68)" fill="#fff" />
+        <ellipse cx="130" cy="68" rx="17" ry="9" transform="rotate(-6 130 68)" fill="#fff" />
       </mask>
       <!-- Happy: arcos ^ ^ -->
       <mask id="m-eyes-happy">
-        <path d="M44 76 Q68 44 92 76" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" />
-        <path d="M108 76 Q132 44 156 76" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" />
+        <path d="M52 74 Q70 52 88 74" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
+        <path d="M112 74 Q130 52 148 74" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
       </mask>
       <!-- Confused: uno grande y alto, otro pequeño y bajo (duda total) -->
       <mask id="m-eyes-confused">
-        <ellipse cx="66" cy="56" rx="22" ry="30" transform="rotate(8 66 56)" fill="#fff" />
-        <ellipse cx="134" cy="78" rx="16" ry="20" transform="rotate(-8 134 78)" fill="#fff" />
+        <ellipse cx="68" cy="58" rx="16" ry="21" transform="rotate(8 68 58)" fill="#fff" />
+        <ellipse cx="132" cy="78" rx="12" ry="15" transform="rotate(-8 132 78)" fill="#fff" />
       </mask>
 
       <!-- Bocas: filas de puntos con la forma de cada expresión -->
