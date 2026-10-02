@@ -53,10 +53,13 @@ const ICONS: Record<string, string> = {
   'yarp': 'dotnetcore/dotnetcore-plain',
   'typescript': 'typescript/typescript-original',
   'linux': 'linux/linux-original',
+  'java': 'java/java-original',
+  // Sin icono en devicon: SVG local servido desde /public/icons
+  'javafx': '/icons/javafx.svg',
 };
 
 const slug = ICONS[key];
-const src = slug ? `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${slug}.svg` : null;
+const src = slug ? (slug.startsWith('/') ? slug : `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${slug}.svg`) : null;
 const initial = name.trim().charAt(0).toUpperCase();
 
 // Color determinista para el fallback (hash simple del nombre)
