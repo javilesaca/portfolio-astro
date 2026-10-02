@@ -1,0 +1,172 @@
+---
+/**
+ * NovaWidget — NOVA con cara y conversación.
+ *
+ * Une NovaFace (expresiones) con la API del hito 1 (POST /api/ask).
+ * MÁQUINA DE ESTADOS (la cara siempre dice lo que pasa por dentro):
+ *   idle     → esperando tu pregunta
+ *   thinking → petición en vuelo (investiga/recupera)
+ *   speaking → mostrando la respuesta, letra a letra
+ *   happy    → respuesta con citas (tiene pruebas que enseñar)
+ *   confused → error de red o NOVA dice que no lo sabe
+ *
+ * La URL del backend se configura sin recompilar lógica:
+ *   PUBLIC_NOVA_API_URL=http://mi-servidor:8091 npm run build
+ * Por defecto apunta al local (desarrollo).
+ */
+import NovaFace from './NovaFace.astro';
+
+interface Props {
+  /** Pregunta inicial sugerida (el botón "pregúntale a NOVA" la fijará). */
+  initialQuestion?: string;
+}
+const { initialQuestion = '' } = Astro.props;
+// Se inyecta en build: el navegador la leerá como constante.
+const apiBase = import.meta.env.PUBLIC_NOVA_API_URL ?? 'http://localhost:8091';
+---
+
+<div class="nova" data-api={apiBase}>
+  <NovaFace expression="idle" />
+
+  <div class="nova__chat">
+    <div class="nova__log" role="log" aria-live="polite" aria-label="Conversación con NOVA">
+      <p class="nova__msg nova__msg--nova">¡Hola! Soy <strong>NOVA</strong>. Pregúntame por Javier y sus proyectos… con pruebas, no de palabra.</p>
+    </div>
+
+    <form class="nova__form">
+      <label class="visually-hidden" for="nova-input">Pregunta para NOVA</label>
+      <input id="nova-input" type="text" placeholder="Ej. ¿Qué proyecto usa eventos en tiempo real?"
+        autocomplete="off" value={initialQuestion} />
+      <button type="submit">Preguntar</button>
+    </form>
+
+    <div class="nova__sources" hidden>
+      <h3>Fuentes</h3>
+      <ul></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Controlador del widget. Sin frameworks: el estado vive en 3 sitios
+  // visibles (atributo de la cara, lista de mensajes, lista de fuentes).
+  const root = document.querySelector('.nova');
+  const face = document.querySelector('#nova-face');
+  const log = root?.querySelector('.nova__log');
+  const form = root?.querySelector('.nova__form');
+  const input = root?.querySelector('#nova-input');
+  const sources = root?.querySelector('.nova__sources');
+  const sourcesList = sources?.querySelector('ul');
+  const api = root?.dataset.api ?? 'http://localhost:8091';
+
+  /** Cambia la expresión de la cara. Un solo punto de cambio. */
+  const setFace = (expr) => face?.setAttribute('data-expression', expr);
+
+  /** Añade un mensaje al historial (textContent: el modelo nunca inyecta HTML). */
+  const addMsg = (who, text) => {
+    const p = document.createElement('p');
+    p.className = 'nova__msg nova__msg--' + who;
+    p.textContent = text;
+    log?.appendChild(p);
+    p.scrollIntoView({ block: 'nearest' });
+    return p;
+  };
+
+  /** Efecto máquina de escribir: NOVA "habla" mientras aparece el texto. */
+  const typewriter = (el, text) => new Promise((resolve) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = text; // Sin movimiento: texto directo, misma info.
+      resolve();
+      return;
+    }
+    let i = 0;
+    const tick = () => {
+      el.textContent = text.slice(0, i += 3);
+      if (i < text.length) setTimeout(tick, 12);
+      else resolve();
+    };
+    tick();
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = input?.value.trim();
+    if (!question || form.dataset.busy) return; // Sin texto o ya pensando: nada.
+    form.dataset.busy = '1';
+    input.value = '';
+    addMsg('user', question);
+    setFace('thinking'); // NOVA investiga: ojos entrecerrados.
+    const pending = addMsg('nova', 'Consultando mis fuentes…');
+
+    try {
+      const res = await fetch(api + '/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      setFace('speaking'); // NOVA responde: la boca se mueve.
+      await typewriter(pending, data.answer);
+
+      // Fuentes: el panel de evidencias. Sin citas no hay credibilidad.
+      const cites = data.citations ?? [];
+      if (sources && sourcesList) {
+        sourcesList.innerHTML = '';
+        cites.forEach((c) => {
+          const li = document.createElement('li');
+          li.textContent = c.title + ' (' + c.project + ')';
+          sourcesList.appendChild(li);
+        });
+        sources.hidden = cites.length === 0;
+      }
+      // ¿Sabe o no sabe? La cara lo delata con honestidad.
+      const knows = cites.length > 0 && !/no (dispongo|tengo)/i.test(data.answer);
+      setFace(knows ? 'happy' : 'confused');
+    } catch (err) {
+      pending.textContent = 'No pude contactar con mi cerebro (¿está NOVA en marcha?).';
+      setFace('confused');
+    } finally {
+      delete form.dataset.busy;
+      // Tras 4 s celebrando o dudando, vuelve a reposo. Transitorio, no sticky.
+      setTimeout(() => {
+        if (face?.dataset.expression === 'happy' || face?.dataset.expression === 'confused') {
+          setFace('idle');
+        }
+      }, 4000);
+    }
+  });
+</script>
+
+<style>
+  .nova {
+    display: grid; gap: 1.5rem; align-items: start;
+    grid-template-columns: auto 1fr;
+    background: #0d1526; border: 1px solid #22d3ee33; border-radius: 16px;
+    padding: 1.5rem;
+  }
+  @media (max-width: 640px) { .nova { grid-template-columns: 1fr; } }
+  .nova__log { display: flex; flex-direction: column; gap: .5rem;
+    max-height: 320px; overflow-y: auto; margin-bottom: 1rem; }
+  .nova__msg { margin: 0; padding: .6rem .9rem; border-radius: 12px; max-width: 90%; }
+  .nova__msg--nova { background: #16213a; align-self: flex-start; }
+  .nova__msg--user { background: #0e7490; color: #fff; align-self: flex-end; }
+  .nova__form { display: flex; gap: .5rem; }
+  .nova__form input {
+    flex: 1; padding: .6rem .9rem; border-radius: 10px;
+    border: 1px solid #334155; background: #0b0e14; color: inherit;
+  }
+  .nova__form button {
+    padding: .6rem 1.1rem; border-radius: 10px; border: 0; cursor: pointer;
+    background: #22d3ee; color: #04222f; font-weight: 700;
+  }
+  .nova__sources { margin-top: 1rem; font-size: .9rem; color: #9ca3af; }
+  .nova__sources h3 { font-size: .85rem; text-transform: uppercase;
+    letter-spacing: .08em; margin: 0 0 .4rem; }
+  .nova__sources ul { margin: 0; padding-left: 1.2rem; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+</style>
