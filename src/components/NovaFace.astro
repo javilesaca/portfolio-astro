@@ -36,42 +36,42 @@ const { expression = 'idle' } = Astro.props;
       </pattern>
 
       <!-- Ojos estilo EVA: óvalos alargados, inclinados hacia el centro -->
-      <g id="m-eyes-idle">
+      <mask id="m-eyes-idle">
         <ellipse cx="68" cy="66" rx="24" ry="34" transform="rotate(8 68 66)" fill="#fff" />
         <ellipse cx="132" cy="66" rx="24" ry="34" transform="rotate(-8 132 66)" fill="#fff" />
-      </g>
+      </mask>
       <!-- Thinking: ojos entornados (rendijas de concentración) -->
-      <g id="m-eyes-thinking">
+      <mask id="m-eyes-thinking">
         <ellipse cx="68" cy="68" rx="24" ry="12" transform="rotate(6 68 68)" fill="#fff" />
         <ellipse cx="132" cy="68" rx="24" ry="12" transform="rotate(-6 132 68)" fill="#fff" />
-      </g>
+      </mask>
       <!-- Happy: arcos ^ ^ -->
-      <g id="m-eyes-happy">
+      <mask id="m-eyes-happy">
         <path d="M44 76 Q68 44 92 76" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" />
         <path d="M108 76 Q132 44 156 76" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" />
-      </g>
+      </mask>
       <!-- Confused: uno grande y alto, otro pequeño y bajo (duda total) -->
-      <g id="m-eyes-confused">
+      <mask id="m-eyes-confused">
         <ellipse cx="66" cy="56" rx="22" ry="30" transform="rotate(8 66 56)" fill="#fff" />
         <ellipse cx="134" cy="78" rx="16" ry="20" transform="rotate(-8 134 78)" fill="#fff" />
-      </g>
+      </mask>
 
       <!-- Bocas: filas de puntos con la forma de cada expresión -->
-      <g id="m-mouth-smile">
+      <mask id="m-mouth-smile">
         <path d="M78 118 Q100 134 122 118" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
-      </g>
-      <g id="m-mouth-flat">
+      </mask>
+      <mask id="m-mouth-flat">
         <line x1="80" y1="120" x2="120" y2="120" stroke="#fff" stroke-width="9" stroke-linecap="round" />
-      </g>
-      <g id="m-mouth-grin">
+      </mask>
+      <mask id="m-mouth-grin">
         <path d="M74 114 Q100 146 126 114 Q100 128 74 114" fill="#fff" />
-      </g>
-      <g id="m-mouth-wavy">
+      </mask>
+      <mask id="m-mouth-wavy">
         <path d="M78 120 Q88 114 96 121 Q104 128 112 121 Q118 116 124 120" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
-      </g>
-      <g id="m-mouth-talk">
+      </mask>
+      <mask id="m-mouth-talk">
         <ellipse cx="100" cy="122" rx="13" ry="15" fill="#fff" />
-      </g>
+      </mask>
     </defs>
 
     <!-- Pantalla: chasis oscuro del panel -->
