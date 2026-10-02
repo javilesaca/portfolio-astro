@@ -1,21 +1,21 @@
 ---
 /**
- * NovaFace — la cara de NOVA.
+ * NovaFace — cara LED de NOVA.
  *
- * Inspirada en robots de cine (pantalla oscura + ojos luminosos) pero con
- * diseño propio: proporciones, color y nombre originales.
+ * Diseño: panel de PUNTOS (dot-matrix) sobre pantalla oscura. Los ojos imitan
+ * el estilo EVA (óvalos alargados, levemente inclinados hacia dentro) pero con
+ * geometría propia. La boca también es una fila de puntos.
  *
- * CÓMO FUNCIONA:
- * - El componente dibuja ojos + boca en SVG. Cada EXPRESIÓN es un conjunto
- *   de formas; solo una visible a la vez (atributo data-expression).
- * - `NovaWidget` (u otro padre) cambia la expresión con:
- *     document.querySelector('#nova-face').dataset.expression = 'thinking'
- * - La "vida" (parpadeo, mirada que sigue el cursor) va en el <script> de abajo.
- * - Accesibilidad: role="img" con aria-label, y si el usuario prefiere menos
- *   movimiento (prefers-reduced-motion) se congela la animación.
+ * TRUCO SVG: no dibujamos cientos de círculos a mano. Definimos un <pattern>
+ * de puntos y una <mask> con la forma (ojos/boca en blanco); el rectángulo
+ * de puntos recortado por la máscara SOLO enciende los puntos de la forma.
+ * Resultado: estética LED con muy poco código, y las expresiones son solo
+ * distintas máscaras (un grupo visible a la vez vía data-expression).
+ *
+ * API (la usa NovaWidget, sin cambios):
+ *   cara.dataset.expression = 'idle' | 'thinking' | 'speaking' | 'happy' | 'confused'
  */
 interface Props {
-  /** Expresión inicial. */
   expression?: 'idle' | 'thinking' | 'speaking' | 'happy' | 'confused';
 }
 const { expression = 'idle' } = Astro.props;
@@ -29,138 +29,136 @@ const { expression = 'idle' } = Astro.props;
   aria-label="NOVA, la asistente del portfolio"
 >
   <svg viewBox="0 0 200 160" aria-hidden="true">
-    <!-- Pantalla: el "casco" oscuro de NOVA -->
-    <rect x="10" y="10" width="180" height="140" rx="42" class="face__screen" />
+    <defs>
+      <!-- Rejilla de puntos luminosos (la "bombilla" del panel LED) -->
+      <pattern id="nova-dots" width="7" height="7" patternUnits="userSpaceOnUse">
+        <circle cx="3.5" cy="3.5" r="2.3" class="dot" />
+      </pattern>
 
-    <!-- OJOS IDLE: dos óvalos luminosos (pupilas en grupo para moverlas) -->
-    <g class="eyes eyes--idle">
-      <ellipse cx="70" cy="70" rx="20" ry="26" class="eye" />
-      <ellipse cx="130" cy="70" rx="20" ry="26" class="eye" />
-      <g class="pupils">
-        <circle cx="70" cy="74" r="8" class="pupil" />
-        <circle cx="130" cy="74" r="8" class="pupil" />
+      <!-- Ojos estilo EVA: óvalos alargados, inclinados hacia el centro -->
+      <g id="m-eyes-idle">
+        <ellipse cx="68" cy="66" rx="24" ry="34" transform="rotate(8 68 66)" fill="#fff" />
+        <ellipse cx="132" cy="66" rx="24" ry="34" transform="rotate(-8 132 66)" fill="#fff" />
       </g>
-    </g>
-
-    <!-- OJOS THINKING: entrecerrados, mirada al lateral (investigando) -->
-    <g class="eyes eyes--thinking">
-      <ellipse cx="70" cy="72" rx="20" ry="14" class="eye" />
-      <ellipse cx="130" cy="72" rx="20" ry="14" class="eye" />
-      <g class="pupils pupils--side">
-        <circle cx="78" cy="72" r="7" class="pupil" />
-        <circle cx="138" cy="72" r="7" class="pupil" />
+      <!-- Thinking: ojos entornados (rendijas de concentración) -->
+      <g id="m-eyes-thinking">
+        <ellipse cx="68" cy="68" rx="24" ry="12" transform="rotate(6 68 68)" fill="#fff" />
+        <ellipse cx="132" cy="68" rx="24" ry="12" transform="rotate(-6 132 68)" fill="#fff" />
       </g>
-    </g>
+      <!-- Happy: arcos ^ ^ -->
+      <g id="m-eyes-happy">
+        <path d="M44 76 Q68 44 92 76" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" />
+        <path d="M108 76 Q132 44 156 76" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" />
+      </g>
+      <!-- Confused: uno grande y alto, otro pequeño y bajo (duda total) -->
+      <g id="m-eyes-confused">
+        <ellipse cx="66" cy="56" rx="22" ry="30" transform="rotate(8 66 56)" fill="#fff" />
+        <ellipse cx="134" cy="78" rx="16" ry="20" transform="rotate(-8 134 78)" fill="#fff" />
+      </g>
 
-    <!-- OJOS HAPPY: arcos ^ ^ (contenta con su respuesta) -->
-    <g class="eyes eyes--happy">
-      <path d="M48 78 Q70 50 92 78" class="eye-stroke" />
-      <path d="M108 78 Q130 50 152 78" class="eye-stroke" />
-    </g>
+      <!-- Bocas: filas de puntos con la forma de cada expresión -->
+      <g id="m-mouth-smile">
+        <path d="M78 118 Q100 134 122 118" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
+      </g>
+      <g id="m-mouth-flat">
+        <line x1="80" y1="120" x2="120" y2="120" stroke="#fff" stroke-width="9" stroke-linecap="round" />
+      </g>
+      <g id="m-mouth-grin">
+        <path d="M74 114 Q100 146 126 114 Q100 128 74 114" fill="#fff" />
+      </g>
+      <g id="m-mouth-wavy">
+        <path d="M78 120 Q88 114 96 121 Q104 128 112 121 Q118 116 124 120" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" />
+      </g>
+      <g id="m-mouth-talk">
+        <ellipse cx="100" cy="122" rx="13" ry="15" fill="#fff" />
+      </g>
+    </defs>
 
-    <!-- OJOS CONFUSED: uno alto y otro bajo (no entendió) -->
-    <g class="eyes eyes--confused">
-      <ellipse cx="70" cy="60" rx="18" ry="22" class="eye" />
-      <ellipse cx="130" cy="80" rx="18" ry="22" class="eye" />
-      <circle cx="70" cy="63" r="7" class="pupil" />
-      <circle cx="130" cy="83" r="7" class="pupil" />
-    </g>
+    <!-- Pantalla: chasis oscuro del panel -->
+    <rect x="10" y="10" width="180" height="140" rx="30" class="face__screen" />
+    <!-- Reflejo superior: vende el "cristal" con dos rectángulos -->
+    <rect x="26" y="22" width="148" height="10" rx="5" class="face__glare" />
 
-    <!-- BOCA: una línea de luz; su forma depende de la expresión.
-         Hablando: se anima (abre/cierra) con CSS mientras dura la respuesta. -->
-    <g class="mouth">
-      <path d="M80 120 Q100 132 120 120" class="mouth__smile" />
-      <line x1="80" y1="122" x2="120" y2="122" class="mouth__flat" />
-      <path d="M78 118 Q100 142 122 118 Q100 128 78 118" class="mouth__grin" />
-      <path d="M80 120 Q90 116 100 122 Q110 128 120 120" class="mouth__wavy" />
-      <ellipse cx="100" cy="124" rx="10" ry="12" class="mouth__talk" />
+    <!-- Cada estado = ojos (máscara) + boca (máscara) sobre el patrón de puntos.
+         Solo el estado del data-expression se muestra (ver CSS). -->
+    <g class="face-state face-state--idle">
+      <g mask="url(#m-eyes-idle)" class="led led--eyes"><rect x="30" y="20" width="140" height="90" fill="url(#nova-dots)" /></g>
+      <g mask="url(#m-mouth-smile)" class="led"><rect x="60" y="104" width="80" height="44" fill="url(#nova-dots)" /></g>
+    </g>
+    <g class="face-state face-state--thinking">
+      <g mask="url(#m-eyes-thinking)" class="led led--eyes"><rect x="30" y="20" width="140" height="90" fill="url(#nova-dots)" /></g>
+      <g mask="url(#m-mouth-flat)" class="led"><rect x="60" y="104" width="80" height="44" fill="url(#nova-dots)" /></g>
+    </g>
+    <g class="face-state face-state--speaking">
+      <g mask="url(#m-eyes-idle)" class="led led--eyes"><rect x="30" y="20" width="140" height="90" fill="url(#nova-dots)" /></g>
+      <g mask="url(#m-mouth-talk)" class="led led--mouth-talk"><rect x="60" y="100" width="80" height="48" fill="url(#nova-dots)" /></g>
+    </g>
+    <g class="face-state face-state--happy">
+      <g mask="url(#m-eyes-happy)" class="led led--eyes"><rect x="30" y="20" width="140" height="90" fill="url(#nova-dots)" /></g>
+      <g mask="url(#m-mouth-grin)" class="led"><rect x="60" y="100" width="80" height="48" fill="url(#nova-dots)" /></g>
+    </g>
+    <g class="face-state face-state--confused">
+      <g mask="url(#m-eyes-confused)" class="led led--eyes"><rect x="30" y="20" width="140" height="90" fill="url(#nova-dots)" /></g>
+      <g mask="url(#m-mouth-wavy)" class="led"><rect x="60" y="104" width="80" height="44" fill="url(#nova-dots)" /></g>
     </g>
   </svg>
 </div>
 
 <script>
-  // VIDA DE NOVA: parpadeo + mirada. Todo aquí es cosmético: si falla,
-  // la cara sigue funcionando (las expresiones las pone el atributo).
+  // Parpadeo LED: los ojos se apagan 120 ms (como un panel real que refresca).
+  // Sin parpadeo en happy (los arcos no tienen "párpado" que cerrar).
   const face = document.querySelector('#nova-face');
   if (face && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    // Parpadeo: cada 2.5–5.5 s los ojos se "aplanan" 150 ms.
-    // Se salta en happy (los ojos ya son arcos) para no romper la forma.
     const blink = () => {
       if (face.dataset.expression !== 'happy') {
         face.classList.add('is-blinking');
-        setTimeout(() => face.classList.remove('is-blinking'), 150);
+        setTimeout(() => face.classList.remove('is-blinking'), 120);
       }
       setTimeout(blink, 2500 + Math.random() * 3000);
     };
     setTimeout(blink, 2000);
-
-    // Mirada: las pupilas idle siguen el cursor (máx. 6 px, sutil).
-    const pupils = face.querySelector('.eyes--idle .pupils');
-    const svg = face.querySelector('svg');
-    document.addEventListener('mousemove', (e) => {
-      if (!pupils || !svg) return;
-      const r = svg.getBoundingClientRect();
-      const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
-      const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
-      pupils.setAttribute(
-        'transform',
-        `translate(${(dx * 12).toFixed(1)}, ${(dy * 8).toFixed(1)})`
-      );
-    });
   }
 </script>
 
 <style>
-  .nova-face { width: 200px; max-width: 60vw; }
+  .nova-face { width: 220px; max-width: 64vw; }
   .nova-face svg { width: 100%; height: auto; display: block; }
 
-  .face__screen { fill: #0d1526; stroke: #22d3ee33; stroke-width: 2; }
-  .eye { fill: #67e8f9; }
-  .pupil { fill: #0b0e14; }
-  .eye-stroke {
-    fill: none; stroke: #67e8f9; stroke-width: 9; stroke-linecap: round;
+  .face__screen { fill: #05080f; stroke: #164e63; stroke-width: 2; }
+  .face__glare { fill: #ffffff14; }
+  .dot { fill: #67e8f9; }
+
+  /* Brillo neón barato: una sola sombra GPU en vez de filtros SVG caros. */
+  .led { filter: drop-shadow(0 0 5px #22d3ee); }
+
+  /* Solo el estado activo existe visualmente. */
+  .face-state { display: none; }
+  .nova-face[data-expression='idle'] .face-state--idle,
+  .nova-face[data-expression='thinking'] .face-state--thinking,
+  .nova-face[data-expression='speaking'] .face-state--speaking,
+  .nova-face[data-expression='happy'] .face-state--happy,
+  .nova-face[data-expression='confused'] .face-state--confused { display: block; }
+
+  /* Parpadeo: colapsa SOLO los ojos (la boca sigue encendida). */
+  .nova-face.is-blinking .led--eyes {
+    transform-origin: center; transform-box: fill-box;
+    animation: led-blink 0.12s linear;
   }
-  .mouth path, .mouth line {
-    fill: none; stroke: #67e8f9; stroke-width: 5; stroke-linecap: round;
+  @keyframes led-blink { to { transform: scaleY(0.05); } }
+
+  /* Hablando: la boca de puntos "mastica". */
+  .nova-face[data-expression='speaking'] .led--mouth-talk {
+    transform-origin: center; transform-box: fill-box;
+    animation: led-talk 0.45s ease-in-out infinite alternate;
   }
-  .mouth__talk { fill: #67e8f9; stroke: none; }
+  @keyframes led-talk { from { transform: scaleY(0.35); } to { transform: scaleY(1.25); } }
 
-  /* Solo la expresión activa es visible. Por defecto (sin atributo) idle. */
-  .eyes, .mouth > * { display: none; }
-  .nova-face[data-expression='idle'] .eyes--idle,
-  .nova-face[data-expression='thinking'] .eyes--thinking,
-  .nova-face[data-expression='speaking'] .eyes--idle,
-  .nova-face[data-expression='happy'] .eyes--happy,
-  .nova-face[data-expression='confused'] .eyes--confused { display: block; }
-
-  .nova-face[data-expression='idle'] .mouth__smile,
-  .nova-face[data-expression='thinking'] .mouth__flat,
-  .nova-face[data-expression='happy'] .mouth__grin,
-  .nova-face[data-expression='confused'] .mouth__wavy,
-  .nova-face[data-expression='speaking'] .mouth__talk { display: block; }
-
-  /* Hablando: la boca "mastica" (escala vertical rítmica). */
-  .nova-face[data-expression='speaking'] .mouth__talk {
-    transform-origin: 100px 124px;
-    animation: talk 0.5s ease-in-out infinite alternate;
+  /* Thinking: respira con un pulso lento (procesando…). */
+  .nova-face[data-expression='thinking'] .led {
+    animation: led-pulse 1.6s ease-in-out infinite alternate;
   }
-  @keyframes talk { from { transform: scaleY(0.4); } to { transform: scaleY(1.3); } }
+  @keyframes led-pulse { from { opacity: 0.65; } to { opacity: 1; } }
 
-  /* Parpadeo: aplasta solo los ojos idle. */
-  .nova-face.is-blinking .eyes--idle {
-    transform-origin: 100px 70px;
-    animation: blink 0.15s linear;
-  }
-  @keyframes blink { to { transform: scaleY(0.08); } }
-
-  /* Thinking: balanceo suave (está "dando vueltas" a la pregunta). */
-  .nova-face[data-expression='thinking'] svg {
-    transform-origin: 100px 80px;
-    animation: sway 2.4s ease-in-out infinite alternate;
-  }
-  @keyframes sway { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
-
-  /* Sin movimiento: todo quieto, expresiones intactas. */
   @media (prefers-reduced-motion: reduce) {
     .nova-face * { animation: none !important; }
   }
