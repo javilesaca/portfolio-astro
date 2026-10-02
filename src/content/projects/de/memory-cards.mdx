@@ -1,32 +1,36 @@
 ---
 title: "Memory Cards"
-description: "Memory-Spiel in Vanilla-JavaScript ES6+. Ohne Abhängigkeiten, modular, barrierefrei (WCAG 2.1 AA), mit Stufen, Timer, Zugzähler und localStorage."
-shortDescription: "Barrierefreies Vanilla-JS-Memory ohne Abhängigkeiten, mit lokaler Persistenz."
-techStack: ["Vanilla JavaScript (ES6+)", "CSS Custom Properties", "HTML5 Semántico", "localStorage", "Web Components"]
+description: "Arcade-Memory in bundler-freiem JavaScript ES6+: lückenloses responsives Board, 3 Stufen, Hundertstel-Timer und Online-Ranking pro Stufe mit Firebase Firestore und localStorage-Fallback."
+shortDescription: "Arcade-Memory mit Firebase-Online-Ranking und lokalem Fallback."
+techStack: ["JavaScript ES6+ (ESM)", "HTML5 + CSS Grid", "Firebase Firestore", "localStorage (fallback)", "Node Test Runner"]
 role: "Frontend"
 status: "completed"
 featured: false
 startDate: "2023-05-20"
-endDate: "2023-07-10"
-repoUrl: "https://github.com/javilesaca/memoryCard"
-demoUrl: "https://javilesaca.github.io/memoryCard/"
+repoUrl: "https://github.com/javilesaca/memorycard-web"
+demoUrl: "https://javilesaca.pro/memoryCard/"
 image: "../../../assets/MemoryCards.jpeg"
-imageAlt: "Memory-Cards-4x4-Board mit aufgedeckten Karten, Zugzähler und Timer"
+imageAlt: "Memory-Cards-Arcade-Board mit Ranking und Timer"
 challenges:
-  - "Fisher-Yates-Shuffle für faire Verteilung"
-  - "Volle Barrierefreiheit: Tastaturnavigation, ARIA-Live-Regionen, Fokusmanagement"
-  - "Modulare Architektur ohne Bundler (natives ESM, CSS Custom Properties)"
-  - "Spielstand-Persistenz in localStorage mit effizienter Serialisierung"
+  - "Responsives Board, das Zeilen x Spalten pro Bildschirm berechnet, immer volles Rechteck (js/board.js, getestet)"
+  - "Ranking pro Stufe in Firestore mit Composite-Index (Stufe + Zeit) und localStorage-Fallback"
+  - "Migration von Supabase zu Firebase: Supabase pausierte die DB bei Inaktivität"
+  - "Best-effort-Sync ausstehender lokaler Scores"
 learnings:
-  - "Module/Revealing-Module-Pattern in modernem JS"
-  - "CSS Container Queries für responsive Komponenten"
-  - "IntersectionObserver für Asset-Lazy-Loading"
-  - "E2E-Tests mit Playwright, ohne Framework"
+  - "Native ESM-Module ohne Bundler, getestet mit node --test"
+  - "CSS Grid + aspect-ratio für lückenlose Boards"
+  - "Offline-first-Design: Cloud zuerst, lokal als Reserve"
 metrics:
-  - label: "Bundle size (gzipped)"
-    value: "4.2 KB"
-  - label: "Lighthouse Performance"
-    value: "100"
-  - label: "Barrierefreiheit (axe)"
-    value: "0 violations"
+  - label: "Stufen"
+    value: "3 (Leicht 10-12 · Normal 16-20 · Schwer 24-30)"
+  - label: "Ranking"
+    value: "Top 10 pro Stufe"
 ---
+
+## Desktop-Version
+
+Desktop-Schwesterversion in **Java + JavaFX**: [javilesaca/memoryCard](https://github.com/javilesaca/memoryCard).
+
+## Backend
+
+Ranking in **Firebase Firestore** mit `localStorage`-Fallback. Von Supabase migriert, weil der Free-Tarif die Datenbank bei Inaktivität pausierte.

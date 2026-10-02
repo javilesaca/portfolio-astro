@@ -1,32 +1,36 @@
 ---
 title: "Memory Cards"
-description: "Gioco di memoria in JavaScript vanilla ES6+. Zero dipendenze, modulare, accessibile (WCAG 2.1 AA), con livelli, timer, contamosse e persistenza localStorage."
-shortDescription: "Gioco di memoria vanilla JS accessibile, senza dipendenze, con persistenza locale."
-techStack: ["Vanilla JavaScript (ES6+)", "CSS Custom Properties", "HTML5 Semántico", "localStorage", "Web Components"]
+description: "Gioco di memoria arcade in JavaScript ES6+ senza bundler: tabellone responsive senza buchi, 3 livelli, timer centesimale e classifica online per livello con Firebase Firestore e fallback localStorage."
+shortDescription: "Arcade di memoria con classifica online Firebase e fallback locale."
+techStack: ["JavaScript ES6+ (ESM)", "HTML5 + CSS Grid", "Firebase Firestore", "localStorage (fallback)", "Node Test Runner"]
 role: "Frontend"
 status: "completed"
 featured: false
 startDate: "2023-05-20"
-endDate: "2023-07-10"
-repoUrl: "https://github.com/javilesaca/memoryCard"
-demoUrl: "https://javilesaca.github.io/memoryCard/"
+repoUrl: "https://github.com/javilesaca/memorycard-web"
+demoUrl: "https://javilesaca.pro/memoryCard/"
 image: "../../../assets/MemoryCards.jpeg"
-imageAlt: "Tavolo Memory Cards 4x4 con carte girate, contamosse e timer"
+imageAlt: "Tabellone arcade Memory Cards con classifica e timer"
 challenges:
-  - "Mescolamento Fisher-Yates per distribuzione equa"
-  - "Accessibilità completa: navigazione tastiera, regioni live ARIA, gestione focus"
-  - "Architettura modulare senza bundler (ESM nativo, custom properties CSS)"
-  - "Persistenza dello stato in localStorage con serializzazione efficiente"
+  - "Tabellone responsive che calcola righe x colonne per schermo, sempre rettangolo pieno (js/board.js, testato)"
+  - "Classifica per livello su Firestore con indice composto (livello + tempo) e fallback localStorage"
+  - "Migrazione da Supabase a Firebase: Supabase metteva in pausa il DB per inattività"
+  - "Sincronizzazione best-effort dei punteggi locali in sospeso"
 learnings:
-  - "Pattern Module/Revealing Module in JS moderno"
-  - "Container Queries CSS per componenti responsive"
-  - "IntersectionObserver per lazy-loading degli asset"
-  - "Test E2E con Playwright, senza framework"
+  - "Moduli ESM nativi senza bundler, testati con node --test"
+  - "CSS Grid + aspect-ratio per tabelloni senza buchi"
+  - "Design offline-first: cloud prima, locale come riserva"
 metrics:
-  - label: "Bundle size (gzipped)"
-    value: "4.2 KB"
-  - label: "Lighthouse Performance"
-    value: "100"
-  - label: "Accessibilità (axe)"
-    value: "0 violations"
+  - label: "Livelli"
+    value: "3 (Facile 10-12 · Normale 16-20 · Difficile 24-30)"
+  - label: "Classifica"
+    value: "Top 10 per livello"
 ---
+
+## Versione desktop
+
+Versione sorella desktop in **Java + JavaFX**: [javilesaca/memoryCard](https://github.com/javilesaca/memoryCard).
+
+## Backend
+
+Classifica su **Firebase Firestore** con fallback `localStorage`. Migrato da Supabase perché il piano gratuito metteva in pausa il database per inattività.

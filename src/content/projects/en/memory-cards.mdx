@@ -1,32 +1,36 @@
 ---
 title: "Memory Cards"
-description: "Memory game (Concentration) in vanilla JavaScript ES6+. Zero dependencies, modular, accessible (WCAG 2.1 AA), with difficulty levels, timer, move counter and localStorage persistence."
-shortDescription: "Accessible vanilla-JS memory game, dependency-free, with local persistence."
-techStack: ["Vanilla JavaScript (ES6+)", "CSS Custom Properties", "HTML5 Semántico", "localStorage", "Web Components"]
+description: "Arcade-style memory game in bundler-free JavaScript ES6+: gapless responsive board, 3 difficulty levels, centisecond timer and online per-level ranking on Firebase Firestore with localStorage fallback."
+shortDescription: "Arcade memory game with online Firebase ranking and local fallback."
+techStack: ["JavaScript ES6+ (ESM)", "HTML5 + CSS Grid", "Firebase Firestore", "localStorage (fallback)", "Node Test Runner"]
 role: "Frontend"
 status: "completed"
 featured: false
 startDate: "2023-05-20"
-endDate: "2023-07-10"
-repoUrl: "https://github.com/javilesaca/memoryCard"
-demoUrl: "https://javilesaca.github.io/memoryCard/"
+repoUrl: "https://github.com/javilesaca/memorycard-web"
+demoUrl: "https://javilesaca.pro/memoryCard/"
 image: "../../../assets/MemoryCards.jpeg"
-imageAlt: "Memory Cards 4x4 board with flipped cards, move counter and timer"
+imageAlt: "Memory Cards arcade board with player ranking and timer"
 challenges:
-  - "Fisher-Yates shuffle for fair distribution"
-  - "Full accessibility: keyboard navigation, ARIA live regions, focus management"
-  - "Modular architecture without bundler (native ESM, CSS custom properties)"
-  - "Game-state persistence in localStorage with efficient serialization"
+  - "Responsive board computing rows x columns per screen, always a full rectangle (js/board.js, tested)"
+  - "Per-level Firestore ranking with composite index (level + time) and localStorage fallback: demo never loses its ranking"
+  - "Migration from Supabase to Firebase: Supabase paused the DB on inactivity; Firestore keeps the ranking always available"
+  - "Best-effort sync of pending local scores when connection returns"
 learnings:
-  - "Module/Revealing Module pattern in modern JS"
-  - "CSS Container Queries for responsive components"
-  - "IntersectionObserver for asset lazy-loading"
-  - "E2E testing with Playwright, no framework"
+  - "Native ESM modules without bundler, tested with node --test"
+  - "CSS Grid + aspect-ratio for gapless responsive boards"
+  - "Offline-first design: cloud first, local as backup"
 metrics:
-  - label: "Bundle size (gzipped)"
-    value: "4.2 KB"
-  - label: "Lighthouse Performance"
-    value: "100"
-  - label: "Accessibility (axe)"
-    value: "0 violations"
+  - label: "Levels"
+    value: "3 (Easy 10-12 - Normal 16-20 - Hard 24-30)"
+  - label: "Ranking"
+    value: "Top 10 per level"
 ---
+
+## Desktop version
+
+A sibling desktop version in **Java + JavaFX** exists (same mechanics, FXML UI with CSS and sounds): [javilesaca/memoryCard](https://github.com/javilesaca/memoryCard).
+
+## Backend
+
+Ranking on **Firebase Firestore** with `localStorage` fallback. Migrated from Supabase because its free tier paused the database on inactivity.

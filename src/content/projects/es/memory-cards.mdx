@@ -1,32 +1,36 @@
 ---
 title: "Memory Cards"
-description: "Juego de memoria (Concentración) desarrollado en vanilla JavaScript ES6+. Sin dependencias, modular, accesible (WCAG 2.1 AA), con niveles de dificultad, temporizador, contador de movimientos y persistencia en localStorage."
-shortDescription: "Juego de memoria vanilla JS accesible, sin dependencias, con persistencia local."
-techStack: ["Vanilla JavaScript (ES6+)", "CSS Custom Properties", "HTML5 Semántico", "localStorage", "Web Components"]
+description: "Juego de memoria estilo arcade en JavaScript ES6+ sin bundler: tablero responsive sin huecos, 3 dificultades, temporizador centesimal y ranking online por niveles con Firebase Firestore y fallback a localStorage."
+shortDescription: "Arcade de memoria con ranking online Firebase y fallback local."
+techStack: ["JavaScript ES6+ (ESM)", "HTML5 + CSS Grid", "Firebase Firestore", "localStorage (fallback)", "Node Test Runner"]
 role: "Frontend"
 status: "completed"
 featured: false
 startDate: "2023-05-20"
-endDate: "2023-07-10"
-repoUrl: "https://github.com/javilesaca/memoryCard"
-demoUrl: "https://javilesaca.github.io/memoryCard/"
+repoUrl: "https://github.com/javilesaca/memorycard-web"
+demoUrl: "https://javilesaca.pro/memoryCard/"
 image: "../../../assets/MemoryCards.jpeg"
-imageAlt: "Juego Memory Cards mostrando tablero 4x4 con cartas volteadas, contador de movimientos y temporizador"
+imageAlt: "Tablero arcade de Memory Cards con ranking de jugadores y temporizador"
 challenges:
-  - "Algoritmo de barajado Fisher-Yates para distribución justa"
-  - "Accesibilidad completa: navegación teclado, ARIA live regions, focus management"
-  - "Arquitectura modular sin bundler (ESM nativo, CSS custom properties)"
-  - "Persistencia de estado de partida en localStorage con serialización eficiente"
+  - "Tablero responsive que calcula filas × columnas según pantalla, siempre rectángulo lleno (js/board.js, con tests)"
+  - "Ranking por niveles en Firestore con índice compuesto (nivel + tiempo) y fallback a localStorage: la demo nunca se queda sin ranking"
+  - "Migración de Supabase a Firebase: Supabase pausaba la BD por inactividad; Firestore mantiene el ranking siempre disponible"
+  - "Sincronización best-effort de puntuaciones locales pendientes cuando vuelve la conexión"
 learnings:
-  - "Patrón Module/Revealing Module en JS moderno"
-  - "CSS Container Queries para componentes responsivos"
-  - "IntersectionObserver para lazy-loading de assets"
-  - "Testing E2E con Playwright sin framework"
+  - "Módulos ESM nativos sin bundler y tests con node --test"
+  - "CSS Grid + aspect-ratio para tablerosResponsive sin huecos"
+  - "Diseño offline-first: nube primero, local como respaldo"
 metrics:
-  - label: "Bundle size (gzipped)"
-    value: "4.2 KB"
-  - label: "Lighthouse Performance"
-    value: "100"
-  - label: "Accesibilidad (axe)"
-    value: "0 violations"
+  - label: "Dificultades"
+    value: "3 (Fácil 10-12 · Normal 16-20 · Difícil 24-30)"
+  - label: "Ranking"
+    value: "Top 10 por nivel"
 ---
+
+## Versión de escritorio
+
+Existe una versión hermana de escritorio en **Java + JavaFX** (misma mecánica, interfaz FXML con CSS y sonidos): [javilesaca/memoryCard](https://github.com/javilesaca/memoryCard).
+
+## Backend
+
+Ranking en **Firebase Firestore** con fallback a `localStorage`. Se migró desde Supabase porque su plan gratuito pausaba la base de datos por inactividad.

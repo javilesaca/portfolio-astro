@@ -1,32 +1,36 @@
 ---
 title: "Memory Cards"
-description: "Jogo de memória em JavaScript vanilla ES6+. Zero dependências, modular, acessível (WCAG 2.1 AA), com níveis, temporizador, contador e persistência localStorage."
-shortDescription: "Jogo de memória vanilla JS acessível, sem dependências, com persistência local."
-techStack: ["Vanilla JavaScript (ES6+)", "CSS Custom Properties", "HTML5 Semántico", "localStorage", "Web Components"]
+description: "Jogo de memória estilo arcade em JavaScript ES6+ sem bundler: tabuleiro responsivo sem falhas, 3 dificuldades, cronómetro centesimal e ranking online por nível com Firebase Firestore e fallback localStorage."
+shortDescription: "Arcade de memória com ranking online Firebase e fallback local."
+techStack: ["JavaScript ES6+ (ESM)", "HTML5 + CSS Grid", "Firebase Firestore", "localStorage (fallback)", "Node Test Runner"]
 role: "Frontend"
 status: "completed"
 featured: false
 startDate: "2023-05-20"
-endDate: "2023-07-10"
-repoUrl: "https://github.com/javilesaca/memoryCard"
-demoUrl: "https://javilesaca.github.io/memoryCard/"
+repoUrl: "https://github.com/javilesaca/memorycard-web"
+demoUrl: "https://javilesaca.pro/memoryCard/"
 image: "../../../assets/MemoryCards.jpeg"
-imageAlt: "Tabuleiro Memory Cards 4x4 com cartas viradas, contador e temporizador"
+imageAlt: "Tabuleiro arcade de Memory Cards com ranking e cronómetro"
 challenges:
-  - "Baralhamento Fisher-Yates para distribuição justa"
-  - "Acessibilidade total: navegação por teclado, regiões live ARIA, gestão de foco"
-  - "Arquitetura modular sem bundler (ESM nativo, custom properties CSS)"
-  - "Persistência de estado em localStorage com serialização eficiente"
+  - "Tabuleiro responsivo que calcula linhas x colunas por ecrã, sempre retângulo cheio (js/board.js, com testes)"
+  - "Ranking por nível no Firestore com índice composto (nível + tempo) e fallback localStorage"
+  - "Migração de Supabase para Firebase: Supabase pausava a BD por inatividade"
+  - "Sincronização best-effort das pontuações locais pendentes"
 learnings:
-  - "Padrão Module/Revealing Module em JS moderno"
-  - "Container Queries CSS para componentes responsivos"
-  - "IntersectionObserver para lazy-loading de assets"
-  - "Testes E2E com Playwright, sem framework"
+  - "Módulos ESM nativos sem bundler e testes com node --test"
+  - "CSS Grid + aspect-ratio para tabuleiros sem falhas"
+  - "Design offline-first: nuvem primeiro, local como reserva"
 metrics:
-  - label: "Bundle size (gzipped)"
-    value: "4.2 KB"
-  - label: "Lighthouse Performance"
-    value: "100"
-  - label: "Acessibilidade (axe)"
-    value: "0 violations"
+  - label: "Níveis"
+    value: "3 (Fácil 10-12 · Normal 16-20 · Difícil 24-30)"
+  - label: "Ranking"
+    value: "Top 10 por nível"
 ---
+
+## Versão desktop
+
+Existe uma versão irmã desktop em **Java + JavaFX**: [javilesaca/memoryCard](https://github.com/javilesaca/memoryCard).
+
+## Backend
+
+Ranking em **Firebase Firestore** com fallback `localStorage`. Migrado de Supabase porque o plano gratuito pausava a base por inatividade.
