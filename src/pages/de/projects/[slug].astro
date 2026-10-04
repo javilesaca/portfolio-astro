@@ -2,6 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
+import NovaProjectCTA from '../../../components/NovaProjectCTA.astro';
 import { Image } from 'astro:assets';
 import { getCollection, render } from 'astro:content';
 
@@ -35,6 +36,7 @@ const { Content } = await render(project);
       <a href={project.data.repoUrl} target="_blank" rel="noopener noreferrer">Repository ↗</a>
       {project.data.demoUrl && <a href={project.data.demoUrl} target="_blank" rel="noopener noreferrer">Live-Demo ↗</a>}
     </div>
+    <NovaProjectCTA slug={Astro.params.slug ?? ''} title={project.data.title} label="Frag NOVA" question={`Was macht das Projekt ${project.data.title}?`} />
   </article>
   <Footer slot="footer" />
 </BaseLayout>

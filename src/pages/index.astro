@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Hero from '../components/Hero.astro';
-import NovaWidget from '../components/NovaWidget.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 
@@ -16,7 +15,12 @@ const projects = (await getCollection('projects', ({ id }) => id.startsWith('es/
     <div class="container">
       <h2 id="nova-title">Pregúntale a NOVA</h2>
       <p class="lead">Mi asistente responde sobre mi perfil y mis proyectos — siempre con fuentes, nunca de palabra.</p>
-      <NovaWidget />
+      <button type="button" class="btn btn--primary btn--md" data-nova-open>Hablar con NOVA</button>
+      <script>
+        document.querySelector('[data-nova-open]')?.addEventListener('click', () => {
+          document.dispatchEvent(new CustomEvent('nova:open'));
+        });
+      </script>
     </div>
   </section>
   <section id="proyectos" class="section" aria-labelledby="proyectos-title">

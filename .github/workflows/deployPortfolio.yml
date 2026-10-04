@@ -24,6 +24,9 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          # El widget habla con el backend PHP de nova-stellar en el mismo dominio.
+          PUBLIC_NOVA_ENDPOINT: /api/ask.php
         run: npm run build
 
       - name: Install lftp

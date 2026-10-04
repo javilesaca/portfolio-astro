@@ -35,10 +35,19 @@ const d = getDict(lang);
       <p class="hero__title">{title}</p>
       <p class="hero__description">{description}</p>
 
+      <!-- ELEMENTO 4 (quitar si molesta): CTA que abre el dock de NOVA -->
       <div class="hero__actions" role="group" aria-label="Acciones principales">
         <a href="#proyectos" class="btn btn--sm btn--secondary">{d.hero.projects}</a>
         <a href="#contacto" class="btn btn--sm btn--secondary">{d.hero.contact}</a>
+        <button type="button" class="btn btn--sm btn--primary" data-nova-open>✨ Pregúntale a NOVA</button>
       </div>
+      <script>
+        // ELEMENTO 4: abre el dock flotante de NOVA.
+        document.querySelector('[data-nova-open]')?.addEventListener('click', () => {
+          document.dispatchEvent(new CustomEvent('nova:open'));
+        });
+      </script>
+      <!-- FIN ELEMENTO 4 -->
 
       <nav class="hero__social" aria-label="Perfiles profesionales">
         <ul class="hero__social-list" role="list">
