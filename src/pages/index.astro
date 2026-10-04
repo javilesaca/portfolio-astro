@@ -11,6 +11,18 @@ const projects = (await getCollection('projects', ({ id }) => id.startsWith('es/
 <BaseLayout title="Javier Lesaca — IT Infrastructure & Software Developer" description="Portfolio de Javier Lesaca, IT Infrastructure & Software Developer. Infraestructura, software, automatización e IA.">
   <Header slot="header" />
   <Hero />
+  <section id="nova" class="section" aria-labelledby="nova-title">
+    <div class="container">
+      <h2 id="nova-title">Pregúntale a NOVA</h2>
+      <p class="lead">Mi asistente responde sobre mi perfil y mis proyectos — siempre con fuentes, nunca de palabra.</p>
+      <button type="button" class="btn btn--primary btn--md" data-nova-open>Hablar con NOVA</button>
+      <script>
+        document.querySelector('[data-nova-open]')?.addEventListener('click', () => {
+          document.dispatchEvent(new CustomEvent('nova:open'));
+        });
+      </script>
+    </div>
+  </section>
   <section id="proyectos" class="section" aria-labelledby="proyectos-title">
     <div class="container">
       <h2 id="proyectos-title">Proyectos</h2>

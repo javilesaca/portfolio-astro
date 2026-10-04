@@ -1,0 +1,65 @@
+---
+/**
+ * NovaProjectCTA — botón "pregúntale a NOVA" de cada página de proyecto.
+ *
+ * Abre el dock (NovaWidget) con una pregunta sobre ESTE proyecto y su slug
+ * como contexto de memoria. Sin frameworks: CustomEvent 'nova:open' con
+ * detail {project, question}; el widget precarga y envía (como sus chips).
+ * Los textos llegan por props ya traducidos por cada plantilla de idioma.
+ */
+interface Props {
+  /** Slug del proyecto (coincide con `citations[].project` del backend). */
+  slug: string;
+  /** Título visible (solo para el aria-label). */
+  title: string;
+  /** Texto del botón, en el idioma de la página. */
+  label: string;
+  /** Pregunta sugerida sobre este proyecto, en el idioma de la página. */
+  question: string;
+}
+const { slug, title, label, question } = Astro.props;
+---
+
+<button
+  type="button"
+  class="nova-cta"
+  data-project={slug}
+  data-question={question}
+>
+  <span aria-hidden="true">✨</span> {label}
+  <span class="visually-hidden">: {title}</span>
+</button>
+
+<script>
+  // Cada CTA abre el dock con su proyecto como contexto. Si el dock aún no
+  // existe en el DOM (navegación Astro), el evento se pierde sin romper nada.
+  document.querySelectorAll('.nova-cta').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const project = btn instanceof HTMLElement ? btn.dataset.project ?? '' : '';
+      const question = btn instanceof HTMLElement ? btn.dataset.question ?? '' : '';
+      document.dispatchEvent(new CustomEvent('nova:open', { detail: { project, question } }));
+    });
+  });
+</script>
+
+<style>
+  /* Píldora con el color de marca, a juego con el botón del dock. */
+  .nova-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.1rem;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-brand);
+    color: var(--color-text-inverse);
+    cursor: pointer;
+  }
+  .nova-cta:hover { filter: brightness(1.1); }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+</style>

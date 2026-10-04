@@ -1,0 +1,410 @@
+---
+/**
+ * NovaWidget — dock flotante de NOVA (hito 2, revisión flotante).
+ *
+ * Colapsado: rectángulo redondeado translúcido con la cara abajo-derecha.
+ * Abierto: panel de diálogo con LA MISMA transparencia que el botón, y la
+ * cara ENCIMA del diálogo (no desaparece): gesticula mientras NOVA piensa
+ * y "habla" (mueve la boca) mientras escribe la respuesta.
+ * La CARA nunca es semitransparente: su pantalla LED es sólida (#05080f).
+ *
+ * Montado en BaseLayout → acompaña toda la navegación (cada página Astro
+ * lo re-renderiza; el estado abierto/cerrado sobrevive vía sessionStorage).
+ *
+ * Máquina de estados de la cara: idle · thinking · speaking · happy · confused.
+ * Backend: PUBLIC_NOVA_ENDPOINT (por defecto http://localhost:8091/api/ask;
+ * en producción: /api/ask.php relativo al mismo dominio, servido por nova-stellar).
+ */
+import NovaFace from './NovaFace.astro';
+
+const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/api/ask';
+---
+
+<div class="nova-dock" data-endpoint={endpoint} data-open="false">
+  <!-- ELEMENTO 3 (quitar si molesta): bocadillo teaser sobre el dock.
+       Aparece una vez por sesión hasta que el usuario lo abre o lo cierra. -->
+  <div class="nova-teaser" hidden>
+    <span>¿Te ayudo a evaluar este perfil?</span>
+    <button type="button" class="nova-teaser__close" aria-label="Ocultar aviso">✕</button>
+  </div>
+  <!-- FIN ELEMENTO 3 -->
+  <!-- Botón flotante (solo cuando el diálogo está cerrado) -->
+  <button
+    type="button"
+    class="nova-dock__fab"
+    aria-expanded="false"
+    aria-controls="nova-panel"
+    aria-label="Abrir chat con NOVA"
+  >
+    <NovaFace id="nova-face-fab" expression="idle" />
+  </button>
+
+  <!-- Diálogo: misma transparencia que el botón + cara encima -->
+  <section
+    id="nova-panel"
+    class="nova-dock__panel"
+    aria-label="Chat con NOVA"
+    hidden
+  >
+    <div class="nova-dock__face">
+      <NovaFace id="nova-face-panel" expression="idle" />
+    </div>
+
+    <header class="nova-dock__head">
+      <strong>NOVA</strong>
+      <span class="nova-dock__sub">responde con fuentes, no de palabra</span>
+      <button type="button" class="nova-dock__close" aria-label="Cerrar chat">✕</button>
+    </header>
+
+    <div class="nova__log" role="log" aria-live="polite" aria-label="Conversación con NOVA">
+      <p class="nova__msg nova__msg--nova">¡Hola! Soy <strong>NOVA</strong>. Pregúntame por Javier y sus proyectos… con pruebas, no de palabra.</p>
+    </div>
+
+    <!-- ELEMENTO 5 (quitar si molesta): preguntas sugeridas, un clic = pregunta enviada -->
+    <div class="nova__chips" role="group" aria-label="Preguntas sugeridas">
+      <button type="button" data-q="¿Qué experiencia tiene Javier?">¿Qué experiencia tiene?</button>
+      <button type="button" data-q="¿Qué proyectos usan IA?">¿Qué proyectos usan IA?</button>
+      <button type="button" data-q="¿Por qué contratar a Javier?">¿Por qué contratarle?</button>
+    </div>
+    <!-- FIN ELEMENTO 5 -->
+    <form class="nova__form">
+      <label class="visually-hidden" for="nova-input">Pregunta para NOVA</label>
+      <textarea id="nova-input" rows="3" placeholder="Ej. ¿Qué proyecto usa eventos en tiempo real?" autocomplete="off"></textarea>
+      <button type="submit">Preguntar</button>
+    </form>
+
+    <div class="nova__sources" hidden>
+      <h3>Fuentes</h3>
+      <ul></ul>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Controlador del dock. Sin frameworks: estado en data-open + sessionStorage.
+  const dock = document.querySelector('.nova-dock');
+  const fab = dock?.querySelector('.nova-dock__fab');
+  const panel = dock?.querySelector('.nova-dock__panel');
+  const closeBtn = dock?.querySelector('.nova-dock__close');
+  const faces = dock?.querySelectorAll('.nova-face');
+  const log = dock?.querySelector('.nova__log');
+  const form = dock?.querySelector('.nova__form');
+  const input = dock?.querySelector('#nova-input');
+  const sources = dock?.querySelector('.nova__sources');
+  const sourcesList = sources?.querySelector('ul');
+  const api = dock?.dataset.endpoint ?? 'http://localhost:8091/api/ask';
+  // Memoria mínima de seguimiento (igual que nova-stellar): último proyecto
+  // citado distinto de 'cv'; viaja como {question, context}. Sin citas no se olvida.
+  let lastProject = null;
+
+  const KEY = 'nova-dock-open';
+
+  /** Abre/cierra el panel. Un solo punto de cambio. */
+  const setOpen = (open) => {
+    dock?.setAttribute('data-open', String(open));
+    if (panel) panel.hidden = !open;
+    fab?.setAttribute('aria-expanded', String(open));
+    fab?.setAttribute('aria-label', open ? 'Cerrar chat con NOVA' : 'Abrir chat con NOVA');
+    try { sessionStorage.setItem(KEY, open ? '1' : '0'); } catch { /* privado: sin memoria */ }
+    if (open) { hideTeaser(); input?.focus(); }
+  };
+
+  // Permite que la sección "Pregúntale a NOVA" (y el CTA de cada proyecto)
+  // abra el dock: document.dispatchEvent(new CustomEvent('nova:open',
+  // {detail: {project, question}})). Con detail, fija el contexto de memoria,
+  // precarga la pregunta y la envía (mismo patrón que los chips).
+  document.addEventListener('nova:open', (e) => {
+    setOpen(true);
+    const detail = e instanceof CustomEvent ? e.detail ?? {} : {};
+    if (typeof detail.project === 'string' && detail.project) {
+      lastProject = detail.project;
+    }
+    if (typeof detail.question === 'string' && detail.question && input && form && !form.dataset.busy) {
+      input.value = detail.question;
+      form.requestSubmit();
+    }
+  });
+
+  fab?.addEventListener('click', () => setOpen(dock?.dataset.open !== 'true'));
+  closeBtn?.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dock?.dataset.open === 'true') { setOpen(false); fab?.focus(); }
+  });
+
+  // Restaura el estado al navegar (Astro MPA re-renderiza el dock por página).
+  try { if (sessionStorage.getItem(KEY) === '1') setOpen(true); } catch { /* nada */ }
+
+  /** Cambia la expresión en AMBAS caras (botón y panel) a la vez. */
+  const setFace = (expr) => faces?.forEach((f) => f.setAttribute('data-expression', expr));
+  const currentFace = () => faces?.[0]?.dataset.expression;
+
+  const addMsg = (who, text) => {
+    const p = document.createElement('p');
+    p.className = 'nova__msg nova__msg--' + who;
+    p.textContent = text;
+    log?.appendChild(p);
+    p.scrollIntoView({ block: 'nearest' });
+    return p;
+  };
+
+  const typewriter = (el, text) => new Promise((resolve) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = text;
+      resolve();
+      return;
+    }
+    let i = 0;
+    const tick = () => {
+      el.textContent = text.slice(0, i += 3);
+      if (i < text.length) setTimeout(tick, 12);
+      else resolve();
+    };
+    tick();
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = input?.value.trim();
+    if (!question || form.dataset.busy) return;
+    form.dataset.busy = '1';
+    input.value = '';
+    addMsg('user', question);
+    setFace('thinking'); // NOVA investiga: ojos entrecerrados, cara visible encima.
+    const pending = addMsg('nova', 'Consultando mis fuentes…');
+
+    try {
+      const res = await fetch(api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, context: lastProject }),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const primera = (data.citations ?? []).find((c) => c && c.project && c.project !== 'cv');
+      if (primera) { lastProject = primera.project; }
+
+      setFace('speaking'); // NOVA responde: la boca se mueve mientras escribe.
+      await typewriter(pending, data.answer);
+
+      const cites = data.citations ?? [];
+      if (sources && sourcesList) {
+        sourcesList.innerHTML = '';
+        cites.forEach((c) => {
+          const li = document.createElement('li');
+          li.textContent = c.title + ' (' + c.project + ')';
+          sourcesList.appendChild(li);
+        });
+        sources.hidden = cites.length === 0;
+      }
+      const knows = cites.length > 0 && !/no (dispongo|tengo)/i.test(data.answer);
+      setFace(knows ? 'happy' : 'confused');
+    } catch (err) {
+      pending.textContent = 'No pude contactar con mi cerebro (¿está NOVA en marcha?).';
+      setFace('confused');
+    } finally {
+      delete form.dataset.busy;
+      setTimeout(() => {
+        const expr = currentFace();
+        if (expr === 'happy' || expr === 'confused') setFace('idle');
+      }, 4000);
+    }
+  });
+
+  // ELEMENTO 3: teaser — aparece a los 2,5 s, una vez por sesión.
+  const teaser = dock?.querySelector('.nova-teaser');
+  const TEASER_KEY = 'nova-teaser-seen';
+  const hideTeaser = () => {
+    if (teaser) teaser.hidden = true;
+    try { sessionStorage.setItem(TEASER_KEY, '1'); } catch { /* nada */ }
+  };
+  try {
+    if (teaser && !sessionStorage.getItem(TEASER_KEY) && dock?.dataset.open !== 'true') {
+      setTimeout(() => { if (dock?.dataset.open !== 'true') teaser.hidden = false; }, 2500);
+    }
+  } catch { /* nada */ }
+  teaser?.querySelector('.nova-teaser__close')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideTeaser();
+  });
+  teaser?.addEventListener('click', () => setOpen(true));
+  // FIN ELEMENTO 3
+
+  // ELEMENTO 5: chips — rellenan la pregunta y la envían.
+  dock?.querySelectorAll('.nova__chips [data-q]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      if (input) input.value = chip.dataset.q ?? '';
+      form?.requestSubmit();
+    });
+  });
+  // FIN ELEMENTO 5
+
+  // Mientras el usuario escribe, NOVA pone cara de concentración.
+  // Al vaciar o salir del campo, vuelve a reposo (salvo que esté ocupada).
+  input?.addEventListener('input', () => {
+    if (form?.dataset.busy) return;
+    setFace(input.value.trim() ? 'thinking' : 'idle');
+  });
+  input?.addEventListener('blur', () => {
+    if (!form?.dataset.busy && !input.value.trim()) setFace('idle');
+  });
+
+  // Enter envía (Shift+Enter = salto de línea), como en los chats de verdad.
+  input?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      form?.requestSubmit();
+    }
+  });
+</script>
+
+<style>
+  /* Dock fijo abajo-derecha, por encima del contenido pero bajo el header móvil */
+  .nova-dock {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: var(--z-sticky);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .6rem;
+  }
+
+  /* ELEMENTO 3: bocadillo teaser (borrar bloque para quitarlo) */
+  .nova-teaser {
+    display: flex; align-items: center; gap: .5rem;
+    max-width: 16rem;
+    padding: .55rem .8rem;
+    font-size: var(--text-sm);
+    background: color-mix(in srgb, #05080f 55%, transparent);
+    border: 1px solid var(--color-brand);
+    border-radius: 12px 12px 4px 12px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+  }
+  .nova-teaser[hidden] { display: none; }
+  .nova-teaser__close {
+    background: transparent; border: 0; color: var(--color-text-muted);
+    cursor: pointer; font-size: var(--text-xs); padding: .2rem;
+  }
+  .nova-teaser__close:hover { color: var(--color-text); }
+  /* FIN ELEMENTO 3 */
+
+  /* ELEMENTO 5: chips de preguntas sugeridas (borrar bloque para quitarlos) */
+  .nova__chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .nova__chips button {
+    font-size: var(--text-xs);
+    padding: .35rem .7rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-brand);
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .nova__chips button:hover { background: var(--color-brand-muted); }
+  /* FIN ELEMENTO 5 */
+  .nova-dock__fab,
+  .nova-dock__face {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background: color-mix(in srgb, #05080f 55%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-lg);
+  }
+  .nova-dock__fab {
+    width: 132px;
+    height: 112px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+  }
+  .nova-dock__fab:hover { transform: scale(1.05); border-color: var(--color-brand); }
+  .nova-dock__fab :global(.nova-face) { width: 100%; max-width: none; }
+  /* Cada cara usa sus propios ids SVG (NovaFace los sufija), así que ocultar
+     el botón con display:none es seguro. */
+  .nova-dock[data-open="true"] .nova-dock__fab { display: none; }
+
+  /* Cara ENCIMA del diálogo, a caballo sobre el borde superior */
+  .nova-dock__face {
+    width: 132px;
+    padding: 8px 10px 4px;
+    align-self: center;
+    margin-top: -3.4rem; /* la cara asoma por encima del panel */
+  }
+  .nova-dock__face :global(.nova-face) { width: 100%; max-width: none; }
+
+  /* Panel: MISMA transparencia que el botón */
+  .nova-dock__panel {
+    width: min(24rem, calc(100vw - 2rem));
+    max-height: min(36rem, calc(100vh - 7rem));
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    background: color-mix(in srgb, #05080f 55%, transparent);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-lg);
+    padding: 1rem;
+    padding-top: 0; /* la cara ocupa el hueco superior */
+  }
+  .nova-dock__panel[hidden] { display: none; }
+
+  .nova-dock__head {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    margin-top: .6rem;
+  }
+  .nova-dock__head strong { font-size: var(--text-base); }
+  .nova-dock__sub { flex: 1; font-size: var(--text-xs); color: var(--color-text-muted); }
+  .nova-dock__close {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    color: var(--color-text);
+    cursor: pointer;
+    width: 1.8rem;
+    height: 1.8rem;
+    line-height: 1;
+  }
+  .nova-dock__close:hover { border-color: var(--color-brand); color: var(--color-brand); }
+
+  .nova__log {
+    display: flex; flex-direction: column; gap: .5rem;
+    overflow-y: auto; min-height: 8rem; max-height: 18rem;
+  }
+  .nova__msg { margin: 0; padding: .6rem .9rem; border-radius: 12px; max-width: 92%; font-size: var(--text-sm); }
+  .nova__msg--nova { background: var(--color-bg-elevated); align-self: flex-start; }
+  .nova__msg--user { background: var(--color-brand); color: var(--color-text-inverse); align-self: flex-end; }
+
+  /* Pregunta apilada: textarea a ancho completo (como el historial) y botón debajo */
+  .nova__form { display: flex; flex-direction: column; gap: .5rem; }
+  .nova__form textarea {
+    flex: 1; min-width: 0; min-height: 4.2rem; resize: vertical;
+    padding: .6rem .9rem; border-radius: 12px; font: inherit; font-size: var(--text-sm);
+    border: 1px solid transparent; background: var(--color-bg-elevated); color: var(--color-text);
+  }
+  .nova__form textarea:focus { outline: none; border-color: var(--color-brand); }
+  .nova__form button {
+    width: 100%;
+    padding: .45rem .8rem; font-size: var(--text-sm); border-radius: 10px; border: 0; cursor: pointer;
+    background: var(--color-brand); color: var(--color-text-inverse); font-weight: 700;
+  }
+  .nova__sources { font-size: var(--text-xs); color: var(--color-text-muted); }
+  .nova__sources h3 { font-size: var(--text-xs); text-transform: uppercase;
+    letter-spacing: .08em; margin: 0 0 .3rem; }
+  .nova__sources ul { margin: 0; padding-left: 1.1rem; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nova-dock__fab { transition: none; }
+  }
+</style>

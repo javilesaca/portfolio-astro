@@ -51,6 +51,7 @@ const personJsonLd = {
 import '../styles/tokens.css';
 import '../styles/global.css';
 import BackgroundBlobs from '../components/BackgroundBlobs.astro';
+import NovaWidget from '../components/NovaWidget.astro';
 
 const websiteJsonLd = {
   '@context': 'https://schema.org',
@@ -133,6 +134,9 @@ const websiteJsonLd = {
   <div class="content-layer">
     <slot name="footer" />
   </div>
+
+  <!-- NOVA flotante: acompaña toda la navegación -->
+  <NovaWidget />
 
   <style>
     .content-layer {
