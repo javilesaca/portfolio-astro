@@ -21,10 +21,10 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
 ---
 
 <div class="nova-dock" data-endpoint={endpoint} data-open="false">
-  <!-- ELEMENTO 3 (quitar si molesta): bocadillo teaser sobre el dock.
-       Aparece una vez por sesión hasta que el usuario lo abre o lo cierra. -->
+  <!-- ELEMENTO 3: bocadillo de inactividad (ver JS: tras 1 min sin
+       interactuar con el dock minimizado, visible 5 s, cada 3 min). -->
   <div class="nova-teaser" hidden>
-    <span>¿Te ayudo a evaluar este perfil?</span>
+    <span>Hola, soy NOVA y estoy aquí para ayudarte.</span>
     <button type="button" class="nova-teaser__close" aria-label="Ocultar aviso">✕</button>
   </div>
   <!-- FIN ELEMENTO 3 -->
@@ -52,7 +52,7 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
 
     <header class="nova-dock__head">
       <strong>NOVA</strong>
-      <span class="nova-dock__sub">responde con fuentes, no de palabra</span>
+      <span class="nova-dock__sub">Tu atajo para evaluar este perfil</span>
       <button type="button" class="nova-dock__close" aria-label="Cerrar chat">✕</button>
     </header>
 
@@ -60,12 +60,8 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
       <p class="nova__msg nova__msg--nova">¡Hola! Soy <strong>NOVA</strong>. Pregúntame por Javier y sus proyectos… con pruebas, no de palabra.</p>
     </div>
 
-    <!-- ELEMENTO 5 (quitar si molesta): preguntas sugeridas, un clic = pregunta enviada -->
-    <div class="nova__chips" role="group" aria-label="Preguntas sugeridas">
-      <button type="button" data-q="¿Qué experiencia tiene Javier?">¿Qué experiencia tiene?</button>
-      <button type="button" data-q="¿Qué proyectos usan IA?">¿Qué proyectos usan IA?</button>
-      <button type="button" data-q="¿Por qué contratar a Javier?">¿Por qué contratarle?</button>
-    </div>
+    <!-- ELEMENTO 5: chips dinámicos según página/contexto -->
+    <div class="nova__chips" role="group" aria-label="Preguntas sugeridas"></div>
     <!-- FIN ELEMENTO 5 -->
     <form class="nova__form">
       <label class="visually-hidden" for="nova-input">Pregunta para NOVA</label>
@@ -99,14 +95,25 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
 
   const KEY = 'nova-dock-open';
 
+  const teaser = dock?.querySelector('.nova-teaser');
+  // Ritmo del bocadillo de inactividad: cada 3 min se comprueba si lleva
+  // 1 min sin interactuar con el dock minimizado; de ser así se muestra 5 s.
+  const IDLE_MS = 60 * 1000;
+  const TEASER_MS = 5 * 1000;
+  const EVERY_MS = 3 * 60 * 1000;
+  let lastInteract = Date.now();
+  const touch = () => { lastInteract = Date.now(); };
+  const hideTeaser = () => { if (teaser) teaser.hidden = true; };
+
   /** Abre/cierra el panel. Un solo punto de cambio. */
-  const setOpen = (open) => {
+  const setOpen = (open, focus = true) => {
     dock?.setAttribute('data-open', String(open));
     if (panel) panel.hidden = !open;
     fab?.setAttribute('aria-expanded', String(open));
     fab?.setAttribute('aria-label', open ? 'Cerrar chat con NOVA' : 'Abrir chat con NOVA');
     try { sessionStorage.setItem(KEY, open ? '1' : '0'); } catch { /* privado: sin memoria */ }
-    if (open) { hideTeaser(); input?.focus(); }
+    touch();
+    if (open) { hideTeaser(); if (focus) input?.focus(); }
   };
 
   // Permite que la sección "Pregúntale a NOVA" (y el CTA de cada proyecto)
@@ -131,8 +138,9 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
     if (e.key === 'Escape' && dock?.dataset.open === 'true') { setOpen(false); fab?.focus(); }
   });
 
-  // Restaura el estado al navegar (Astro MPA re-renderiza el dock por página).
-  try { if (sessionStorage.getItem(KEY) === '1') setOpen(true); } catch { /* nada */ }
+  // El dock abierto sobrevive a la navegación: se restaura en silencio
+  // (sin robar el foco) para no descolocar al usuario en cada página.
+  try { if (sessionStorage.getItem(KEY) === '1') setOpen(true, false); } catch { /* nada */ }
 
   /** Cambia la expresión en AMBAS caras (botón y panel) a la vez. */
   const setFace = (expr) => faces?.forEach((f) => f.setAttribute('data-expression', expr));
@@ -141,12 +149,39 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
   const addMsg = (who, text) => {
     const p = document.createElement('p');
     p.className = 'nova__msg nova__msg--' + who;
+    // Los estilos van con scope de Astro: el HTML estático lo trae, pero los
+    // nodos creados en vivo deben copiar el atributo o quedan sin estilos.
+    const scope = [...(log?.attributes ?? [])].find((a) => a.name.startsWith('data-astro-cid'));
+    if (scope) p.setAttribute(scope.name, '');
     p.textContent = text;
     log?.appendChild(p);
     p.scrollIntoView({ block: 'nearest' });
     return p;
   };
 
+  // Enlaza la primera mención de cada proyecto citado dentro del texto.
+  // Nombre corto = título sin paréntesis ("Panel de Eventos (EventDashboard)"
+  // se menciona como "Panel de Eventos"). Solo nodos de texto: sin HTML inyectado.
+  const linkify = (el, enlaces) => {
+    enlaces.slice().sort((a, b) => b.name.length - a.name.length).forEach(({ name, href }) => {
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const nodos = [];
+      while (walker.nextNode()) nodos.push(walker.currentNode);
+      for (const node of nodos) {
+        const idx = node.textContent.toLowerCase().indexOf(name.toLowerCase());
+        if (idx === -1) continue;
+        const medio = node.splitText(idx);
+        const resto = medio.splitText(name.length);
+        void resto;
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = 'nova__link';
+        a.textContent = medio.textContent;
+        medio.replaceWith(a);
+        break;
+      }
+    });
+  };
   const typewriter = (el, text) => new Promise((resolve) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       el.textContent = text;
@@ -154,16 +189,20 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
       return;
     }
     let i = 0;
+    let n = 0;
     const tick = () => {
-      el.textContent = text.slice(0, i += 3);
-      if (i < text.length) setTimeout(tick, 12);
-      else resolve();
+      el.textContent = text.slice(0, i += 1);
+      // Sigue el texto mientras escribe (cada 4 letras, para no saturar).
+      if (++n % 4 === 0) el.scrollIntoView({ block: 'nearest' });
+      if (i < text.length) setTimeout(tick, 24);
+      else { el.scrollIntoView({ block: 'nearest' }); resolve(); }
     };
     tick();
   });
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    touch();
     const question = input?.value.trim();
     if (!question || form.dataset.busy) return;
     form.dataset.busy = '1';
@@ -186,16 +225,22 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
       setFace('speaking'); // NOVA responde: la boca se mueve mientras escribe.
       await typewriter(pending, data.answer);
 
+      // Sin panel de Fuentes: el texto respira. Las citas siguen usándose
+      // para memoria de contexto (lastProject) y la expresión (knows).
       const cites = data.citations ?? [];
-      if (sources && sourcesList) {
-        sourcesList.innerHTML = '';
-        cites.forEach((c) => {
-          const li = document.createElement('li');
-          li.textContent = c.title + ' (' + c.project + ')';
-          sourcesList.appendChild(li);
-        });
-        sources.hidden = cites.length === 0;
-      }
+      if (sources) sources.hidden = true;
+      // Enlaces en el texto: cada proyecto citado enlaza su ficha en el idioma actual.
+      const seg = location.pathname.split('/')[1];
+      const base = { en: '/en/projects/', fr: '/fr/projects/', it: '/it/projects/', de: '/de/projects/', pt: '/pt/projects/' }[seg] ?? '/proyectos/';
+      const vistos = new Set();
+      const enlaces = [];
+      cites.forEach((c) => {
+        if (!c || !c.project || c.project === 'cv' || vistos.has(c.project)) return;
+        vistos.add(c.project);
+        const corto = String(c.title || c.project).replace(/\s*\(.*?\)\s*/g, '').trim() || c.project;
+        enlaces.push({ name: corto, href: base + c.project + '/' });
+      });
+      linkify(pending, enlaces);
       const knows = cites.length > 0 && !/no (dispongo|tengo)/i.test(data.answer);
       setFace(knows ? 'happy' : 'confused');
     } catch (err) {
@@ -210,37 +255,69 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
     }
   });
 
-  // ELEMENTO 3: teaser — aparece a los 2,5 s, una vez por sesión.
-  const teaser = dock?.querySelector('.nova-teaser');
-  const TEASER_KEY = 'nova-teaser-seen';
-  const hideTeaser = () => {
-    if (teaser) teaser.hidden = true;
-    try { sessionStorage.setItem(TEASER_KEY, '1'); } catch { /* nada */ }
-  };
-  try {
-    if (teaser && !sessionStorage.getItem(TEASER_KEY) && dock?.dataset.open !== 'true') {
-      setTimeout(() => { if (dock?.dataset.open !== 'true') teaser.hidden = false; }, 2500);
-    }
-  } catch { /* nada */ }
+  // ELEMENTO 3: bocadillo de inactividad. Cada 3 min: si el dock sigue
+  // minimizado, no está ocupado y lleva 1 min sin interactuar, se muestra
+  // 5 s. Cualquier interacción reinicia el contador.
   teaser?.querySelector('.nova-teaser__close')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideTeaser();
+    touch();
   });
   teaser?.addEventListener('click', () => setOpen(true));
+  setInterval(() => {
+    if (!teaser || dock?.dataset.open === 'true') return;
+    if (form?.dataset.busy) return;
+    if (Date.now() - lastInteract < IDLE_MS) return;
+    teaser.hidden = false;
+    setTimeout(() => { if (dock?.dataset.open !== 'true') teaser.hidden = true; }, TEASER_MS);
+  }, EVERY_MS);
   // FIN ELEMENTO 3
 
-  // ELEMENTO 5: chips — rellenan la pregunta y la envían.
-  dock?.querySelectorAll('.nova__chips [data-q]').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      if (input) input.value = chip.dataset.q ?? '';
-      form?.requestSubmit();
-    });
+  // ELEMENTO 5: chips dinámicos según página/contexto.
+  // Home: preguntas generales; Proyecto: específicas del proyecto (en su idioma).
+  const chipsContainer = dock?.querySelector('.nova__chips');
+  const lang = document.documentElement.lang || 'es';
+  const path = location.pathname;
+  const isProject = path.includes('/proyectos/') || path.includes('/projects/') || path.includes('/projets/') || path.includes('/progetti/') || path.includes('/projekte/');
+  const projectSlug = isProject ? (path.split('/proyectos/')[1]?.split('/')[0] || path.split('/projects/')[1]?.split('/')[0]) : null;
+
+  const chipSets = {
+    es: { home: ['¿Qué experiencia tiene?', '¿Qué proyectos usan IA?', '¿Por qué contratarle?'],
+          project: (slug) => ['¿Qué stack usa ' + slug + '?', '¿Qué retos tuvo ' + slug + '?', '¿Qué tecnologías usa ' + slug + '?'] },
+    en: { home: ['What is the experience?', 'Which projects use AI?', 'Why hire?'],
+          project: (slug) => ['What stack does ' + slug + ' use?', 'What challenges did ' + slug + ' face?', 'What technologies in ' + slug + '?'] },
+    fr: { home: ["Quelle est l'expérience ?", "Quels projets utilisent l'IA ?", "Pourquoi l'embaucher ?"],
+          project: (slug) => ["Quelle stack pour " + slug + " ?", "Quels défis pour " + slug + " ?", "Quelles technologies dans " + slug + " ?"] },
+    it: { home: ["Qual è l'esperienza?", "Quali progetti usano l'IA?", "Perché assumerlo?"],
+          project: (slug) => ["Che stack usa " + slug + "?", "Quali sfide ha avuto " + slug + "?", "Quali tecnologie in " + slug + "?"] },
+    de: { home: ['Was ist die Erfahrung?', 'Welche Projekte nutzen KI?', 'Warum einstellen?'],
+          project: (slug) => ['Welchen Stack nutzt ' + slug + '?', 'Welche Herausforderungen hatte ' + slug + '?', 'Welche Technologien in ' + slug + '?'] },
+    pt: { home: ['Qual é a experiência?', 'Quais projetos usam IA?', 'Por que contratar?'],
+          project: (slug) => ['Qual stack o ' + slug + ' usa?', 'Quais desafios o ' + slug + ' teve?', 'Quais tecnologias no ' + slug + '?'] }
+  };
+  const t = chipSets[lang] || chipSets.es;
+  const questions = isProject && projectSlug ? t.project(projectSlug) : t.home;
+  if (chipsContainer && questions.length) {
+    chipsContainer.innerHTML = questions.map(q => '<button type="button" data-q="' + q + '">' + q + '</button>').join('');
+    // Los botones nacen en vivo por innerHTML: sin el atributo de scope de
+    // Astro quedan sin estilos (la misma razón documentada en addMsg).
+    // Se lo copiamos del contenedor, que sí lo trae del HTML estático.
+    const scope = [...(chipsContainer.attributes ?? [])].find((a) => a.name.startsWith('data-astro-cid'));
+    if (scope) chipsContainer.querySelectorAll('button').forEach((b) => b.setAttribute(scope.name, ''));
+  }
+  chipsContainer?.addEventListener('click', (e) => {
+    const chip = e.target.closest('[data-q]');
+    if (!chip) return;
+    touch();
+    if (input) input.value = chip.dataset.q ?? '';
+    form?.requestSubmit();
   });
   // FIN ELEMENTO 5
 
   // Mientras el usuario escribe, NOVA pone cara de concentración.
   // Al vaciar o salir del campo, vuelve a reposo (salvo que esté ocupada).
   input?.addEventListener('input', () => {
+    touch();
     if (form?.dataset.busy) return;
     setFace(input.value.trim() ? 'thinking' : 'idle');
   });
@@ -277,7 +354,7 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
     padding: .55rem .8rem;
     font-size: var(--text-sm);
     background: color-mix(in srgb, #05080f 55%, transparent);
-    border: 1px solid var(--color-brand);
+    border: 1px solid var(--color-primary);
     border-radius: 12px 12px 4px 12px;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -292,18 +369,20 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
   .nova-teaser__close:hover { color: var(--color-text); }
   /* FIN ELEMENTO 3 */
 
-  /* ELEMENTO 5: chips de preguntas sugeridas (borrar bloque para quitarlos) */
+  /* ELEMENTO 5: chips de preguntas sugeridas (borrar bloque para quitarlos).
+     Pills compactas con borde azul NOVA (#38bdf8): el aspecto anterior al
+     tema verde. Constantes a propósito, no variables del tema. */
   .nova__chips { display: flex; flex-wrap: wrap; gap: .4rem; }
   .nova__chips button {
     font-size: var(--text-xs);
     padding: .35rem .7rem;
     border-radius: var(--radius-full);
-    border: 1px solid var(--color-brand);
+    border: 1px solid #38bdf8;
     background: transparent;
     color: var(--color-text);
     cursor: pointer;
   }
-  .nova__chips button:hover { background: var(--color-brand-muted); }
+  .nova__chips button:hover { background: rgba(56, 189, 248, .15); }
   /* FIN ELEMENTO 5 */
   .nova-dock__fab,
   .nova-dock__face {
@@ -321,7 +400,7 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
     cursor: pointer;
     transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
   }
-  .nova-dock__fab:hover { transform: scale(1.05); border-color: var(--color-brand); }
+  .nova-dock__fab:hover { transform: scale(1.05); border-color: var(--color-primary); }
   .nova-dock__fab :global(.nova-face) { width: 100%; max-width: none; }
   /* Cada cara usa sus propios ids SVG (NovaFace los sufija), así que ocultar
      el botón con display:none es seguro. */
@@ -372,15 +451,15 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
     height: 1.8rem;
     line-height: 1;
   }
-  .nova-dock__close:hover { border-color: var(--color-brand); color: var(--color-brand); }
+  .nova-dock__close:hover { border-color: var(--color-primary); color: var(--color-primary); }
 
   .nova__log {
     display: flex; flex-direction: column; gap: .5rem;
     overflow-y: auto; min-height: 8rem; max-height: 18rem;
   }
   .nova__msg { margin: 0; padding: .6rem .9rem; border-radius: 12px; max-width: 92%; font-size: var(--text-sm); }
-  .nova__msg--nova { background: var(--color-bg-elevated); align-self: flex-start; }
-  .nova__msg--user { background: var(--color-brand); color: var(--color-text-inverse); align-self: flex-end; }
+  .nova__msg--nova { background: var(--color-bg-elevated); align-self: flex-start; font-size: 0.75rem; line-height: 1.5; }
+  .nova__msg--user { background: var(--color-primary); color: var(--color-text-inverse); align-self: flex-end; }
 
   /* Pregunta apilada: textarea a ancho completo (como el historial) y botón debajo */
   .nova__form { display: flex; flex-direction: column; gap: .5rem; }
@@ -389,12 +468,13 @@ const endpoint = import.meta.env.PUBLIC_NOVA_ENDPOINT ?? 'http://localhost:8091/
     padding: .6rem .9rem; border-radius: 12px; font: inherit; font-size: var(--text-sm);
     border: 1px solid transparent; background: var(--color-bg-elevated); color: var(--color-text);
   }
-  .nova__form textarea:focus { outline: none; border-color: var(--color-brand); }
+  .nova__form textarea:focus { outline: none; border-color: var(--color-primary); }
   .nova__form button {
     width: 100%;
     padding: .45rem .8rem; font-size: var(--text-sm); border-radius: 10px; border: 0; cursor: pointer;
-    background: var(--color-brand); color: var(--color-text-inverse); font-weight: 700;
+    background: var(--color-primary); color: var(--color-text-inverse); font-weight: 700;
   }
+  .nova__msg a { color: var(--color-primary); }
   .nova__sources { font-size: var(--text-xs); color: var(--color-text-muted); }
   .nova__sources h3 { font-size: var(--text-xs); text-transform: uppercase;
     letter-spacing: .08em; margin: 0 0 .3rem; }

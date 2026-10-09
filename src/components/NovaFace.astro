@@ -127,11 +127,11 @@ const { expression = 'idle', id = 'nova-face' } = Astro.props;
   .nova-face { width: 220px; max-width: 64vw; }
   .nova-face svg { width: 100%; height: auto; display: block; }
 
-  .face__screen { fill: #05080f; stroke: #14532d; stroke-width: 2; }
-  .dot { fill: #4ade80; }
+  .face__screen { fill: #05080f; stroke: #06b6d4; stroke-width: 2; }
+  .dot { fill: #22d3ee; }
 
-  /* Brillo neón barato: una sola sombra GPU en vez de filtros SVG caros. */
-  .led { filter: drop-shadow(0 0 5px #22c55e); }
+  /* Brillo neón fuerte tipo LED: dos capas de sombra para profundidad. */
+  .led { filter: drop-shadow(0 0 3px #06b6d4) drop-shadow(0 0 10px #06b6d4); }
 
   /* Solo el estado activo existe visualmente. */
   .face-state { display: none; }
