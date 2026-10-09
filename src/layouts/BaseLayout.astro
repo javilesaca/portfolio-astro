@@ -78,8 +78,17 @@ const websiteJsonLd = {
   <meta name="generator" content={Astro.generator} />
   <title>{title} | JaviLesacaPro</title>
   <meta name="description" content={description} />
-  <meta name="theme-color" content="#2e8b57" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#181818" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#181818" />
+  <!-- Tema inicial: siempre oscuro salvo elección guardada (evita el
+       destello claro antes de que corra el JS del Header). -->
+  <script is:inline>
+    try {
+      document.documentElement.setAttribute(
+        'data-theme',
+        localStorage.getItem('theme') === 'light' ? 'light' : 'dark'
+      );
+    } catch { /* sin almacenamiento: oscuro por defecto */ }
+  </script>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />

@@ -286,7 +286,8 @@ const home = lang === 'es' ? '/' : `/${lang}/`;
     });
   }
 
-  // Theme toggle: localStorage > OS preference, dark-first default
+  // Theme toggle: stored choice wins, otherwise always dark on boot
+  // (OS light preference no longer forces light mode).
   const themeBtn = document.querySelector('[data-theme-toggle]');
   const root = document.documentElement;
   const applyTheme = (mode) => {
@@ -301,8 +302,7 @@ const home = lang === 'es' ? '/' : `/${lang}/`;
   if (stored === 'light' || stored === 'dark') {
     applyTheme(stored);
   } else {
-    const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-    applyTheme(prefersLight ? 'light' : 'dark');
+    applyTheme('dark');
   }
   themeBtn?.addEventListener('click', () => {
     const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
