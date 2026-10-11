@@ -1,8 +1,8 @@
 ---
 title: "Hockey Pong"
-description: "Moderne Pong-Variante mit Air-Hockey-Mechanik in Unity. Lokaler Multiplayer, adaptive KI, Partikel und animierte Menüs."
-shortDescription: "Pong/Air-Hockey in Unity mit adaptiver KI und lokalem Multiplayer."
-techStack: ["Unity", "C#", "DOTS/ECS", "URP", "Input System", "Cinemachine"]
+description: "Modernes Remake des Pong-Klassikers mit Air-Hockey-Mechanik in Unity. Lokaler Multiplayer, Match gegen KI-Gegner, Torwart + Stürmer pro Team, Spielfeldvarianten und spielbare WebGL-Demo."
+shortDescription: "Pong/Air-Hockey in Unity mit KI-Gegner und lokalem Multiplayer."
+techStack: ["Unity 6", "C#", "URP", "Unity 2D", "TextMeshPro"]
 role: "Frontend"
 status: "completed"
 featured: true
@@ -11,22 +11,22 @@ endDate: "2023-12-15"
 repoUrl: "https://github.com/javilesaca/UnityHockeyPong"
 demoUrl: "https://lesacamedina.itch.io/hockey-pong"
 image: "../../../assets/HockeyPongB.jpeg"
-imageAlt: "Hockey-Pong-Gameplay mit Partikeln, Schläger-Trail und Punktestand"
+imageAlt: "Hockey-Pong-Gameplay mit Partikeln und Punktestand"
 challenges:
-  - "Deterministische Physik für faires kompetitives Spiel"
-  - "Adaptive KI, die den Spielstil lernt (dynamische Schwierigkeit)"
-  - "60-FPS-Optimierung auf Mobilgeräten mit URP und DOTS/ECS"
-  - "Replay-System und Ghost-Daten für Trainingsmodus"
+  - "2-gegen-2-Gameplay mit Torwart-Stürmer-Koordination pro Team"
+  - "Ballverfolgender KI-Gegner mit Geschwindigkeitstuning pro Achse"
+  - "Persistenter Szenenfluss mit DontDestroyOnLoad-Spielstand + PlayerPrefs"
+  - "WebGL-Build und itch.io-Publishing-Pipeline"
 learnings:
-  - "ECS-Architektur in Unity für hohe Performance"
-  - "Moderne Input-Systeme (Input System Package)"
-  - "Shader Graph für performante Visuals"
-  - "Build-Pipeline für WebGL, Windows, macOS, Linux"
+  - "URP-2D-Setup in Unity 6"
+  - "Rigidbody2D-Physik für Puck und Spieler"
+  - "Szenenfluss und persistente Singletons"
+  - "WebGL-Build-Profil und Browser-Einbettung"
 metrics:
   - label: "Ziel-FPS"
     value: "60+"
   - label: "Plattformen"
-    value: "5"
+    value: "WebGL"
   - label: "C#-Zeilen"
-    value: "~3.2k"
+    value: "~1.3k"
 ---

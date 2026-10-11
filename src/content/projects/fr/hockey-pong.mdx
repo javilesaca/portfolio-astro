@@ -1,8 +1,8 @@
 ---
 title: "Hockey Pong"
-description: "Relecture moderne du Pong avec mécaniques de air-hockey, en Unity. Multijoueur local, IA adaptative, particules et menus animés."
-shortDescription: "Jeu Pong/air-hockey en Unity avec IA adaptative et multijoueur local."
-techStack: ["Unity", "C#", "DOTS/ECS", "URP", "Input System", "Cinemachine"]
+description: "Remake moderne du Pong avec mécaniques de air-hockey, en Unity. Multijoueur local, match contre adversaire IA, gardien + attaquant par équipe, variantes de piste et démo WebGL jouable."
+shortDescription: "Jeu Pong/air-hockey en Unity avec adversaire IA et multijoueur local."
+techStack: ["Unity 6", "C#", "URP", "Unity 2D", "TextMeshPro"]
 role: "Frontend"
 status: "completed"
 featured: true
@@ -11,22 +11,22 @@ endDate: "2023-12-15"
 repoUrl: "https://github.com/javilesaca/UnityHockeyPong"
 demoUrl: "https://lesacamedina.itch.io/hockey-pong"
 image: "../../../assets/HockeyPongB.jpeg"
-imageAlt: "Gameplay Hockey Pong avec particules, traînée de raquette et score"
+imageAlt: "Gameplay Hockey Pong avec particules et score"
 challenges:
-  - "Physique déterministe pour un jeu compétitif équitable"
-  - "IA adaptative qui apprend le style du joueur (difficulté dynamique)"
-  - "Optimisation 60 FPS sur mobile avec URP et DOTS/ECS"
-  - "Système de replay et ghost data pour l'entraînement"
+  - "Gameplay 2v2 avec coordination gardien + attaquant par équipe"
+  - "Adversaire IA qui suit le palet avec réglage de vitesse par axe"
+  - "Flux de scènes persistant avec état DontDestroyOnLoad + PlayerPrefs"
+  - "Build WebGL et pipeline de publication sur itch.io"
 learnings:
-  - "Architecture ECS en Unity pour hautes performances"
-  - "Systèmes d'input modernes (package Input System)"
-  - "Shader Graph pour visuels performants"
-  - "Pipeline de build pour WebGL, Windows, macOS, Linux"
+  - "Configuration URP 2D dans Unity 6"
+  - "Physique Rigidbody2D pour le palet et les joueurs"
+  - "Flux de scènes et singletons persistants"
+  - "Profil de build WebGL et intégration navigateur"
 metrics:
   - label: "FPS cible"
     value: "60+"
   - label: "Plateformes"
-    value: "5"
+    value: "WebGL"
   - label: "Lignes C#"
-    value: "~3.2k"
+    value: "~1.3k"
 ---

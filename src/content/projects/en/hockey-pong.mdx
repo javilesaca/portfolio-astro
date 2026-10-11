@@ -1,8 +1,8 @@
 ---
 title: "Hockey Pong"
-description: "Modern take on classic Pong with air-hockey mechanics, built in Unity. Local multiplayer, adaptive AI, particle system and animated menus."
-shortDescription: "Pong/air-hockey game in Unity with adaptive AI and local multiplayer."
-techStack: ["Unity", "C#", "DOTS/ECS", "URP", "Input System", "Cinemachine"]
+description: "Modern remake of classic Pong with air-hockey mechanics, built in Unity. Local multiplayer, match vs AI opponent, goalkeeper + forward per team, track variants and playable WebGL demo."
+shortDescription: "Pong/air-hockey game in Unity with AI opponent and local multiplayer."
+techStack: ["Unity 6", "C#", "URP", "Unity 2D", "TextMeshPro"]
 role: "Frontend"
 status: "completed"
 featured: true
@@ -11,22 +11,22 @@ endDate: "2023-12-15"
 repoUrl: "https://github.com/javilesaca/UnityHockeyPong"
 demoUrl: "https://lesacamedina.itch.io/hockey-pong"
 image: "../../../assets/HockeyPongB.jpeg"
-imageAlt: "Hockey Pong gameplay with particle effects, paddle trail and score"
+imageAlt: "Hockey Pong gameplay with particle effects and score"
 challenges:
-  - "Deterministic physics for fair competitive play"
-  - "Adaptive AI that learns the player style (dynamic difficulty)"
-  - "60 FPS optimization on mobile with URP and DOTS/ECS"
-  - "Replay system and ghost data for training mode"
+  - "2v2 rink gameplay with goalkeeper + forward coordination per team"
+  - "Ball-tracking AI opponent with per-axis speed tuning"
+  - "Persistent scene flow with DontDestroyOnLoad game state + PlayerPrefs"
+  - "WebGL build and itch.io publishing pipeline"
 learnings:
-  - "ECS architecture in Unity for high performance"
-  - "Modern input systems (Input System package)"
-  - "Shader Graph for performant visuals"
-  - "Build pipeline for WebGL, Windows, macOS, Linux"
+  - "URP 2D setup in Unity 6"
+  - "Rigidbody2D physics for puck and players"
+  - "Scene flow and persistent singletons"
+  - "WebGL build profile and browser embedding"
 metrics:
   - label: "Target FPS"
     value: "60+"
   - label: "Platforms"
-    value: "5"
+    value: "WebGL"
   - label: "C# lines"
-    value: "~3.2k"
+    value: "~1.3k"
 ---

@@ -1,8 +1,8 @@
 ---
 title: "Hockey Pong"
-description: "Versão moderna do Pong com mecânica de air-hockey, em Unity. Multiplayer local, IA adaptativa, partículas e menus animados."
-shortDescription: "Jogo Pong/air-hockey em Unity com IA adaptativa e multiplayer local."
-techStack: ["Unity", "C#", "DOTS/ECS", "URP", "Input System", "Cinemachine"]
+description: "Remake moderno do Pong clássico com mecânica de air-hockey, em Unity. Multiplayer local, partida contra adversário IA, guarda-redes + avançado por equipa, variantes de pista e demo WebGL jogável."
+shortDescription: "Jogo Pong/air-hockey em Unity com adversário IA e multiplayer local."
+techStack: ["Unity 6", "C#", "URP", "Unity 2D", "TextMeshPro"]
 role: "Frontend"
 status: "completed"
 featured: true
@@ -11,22 +11,22 @@ endDate: "2023-12-15"
 repoUrl: "https://github.com/javilesaca/UnityHockeyPong"
 demoUrl: "https://lesacamedina.itch.io/hockey-pong"
 image: "../../../assets/HockeyPongB.jpeg"
-imageAlt: "Gameplay Hockey Pong com partículas, rasto da raquete e placar"
+imageAlt: "Gameplay Hockey Pong com partículas e placar"
 challenges:
-  - "Física determinística para jogo competitivo justo"
-  - "IA adaptativa que aprende o estilo do jogador (dificuldade dinâmica)"
-  - "Otimização 60 FPS em mobile com URP e DOTS/ECS"
-  - "Sistema de replay e ghost data para treino"
+  - "Gameplay 2v2 com coordenação guarda-redes + avançado por equipa"
+  - "Adversário IA que segue o disco com ajuste de velocidade por eixo"
+  - "Fluxo de cenas persistente com estado DontDestroyOnLoad + PlayerPrefs"
+  - "Build WebGL e pipeline de publicação no itch.io"
 learnings:
-  - "Arquitetura ECS em Unity para alta performance"
-  - "Sistemas de input modernos (package Input System)"
-  - "Shader Graph para visuais performantes"
-  - "Pipeline de build para WebGL, Windows, macOS, Linux"
+  - "Configuração URP 2D no Unity 6"
+  - "Física Rigidbody2D para disco e jogadores"
+  - "Fluxo de cenas e singletons persistentes"
+  - "Perfil de build WebGL e integração no navegador"
 metrics:
   - label: "FPS alvo"
     value: "60+"
   - label: "Plataformas"
-    value: "5"
+    value: "WebGL"
   - label: "Linhas C#"
-    value: "~3.2k"
+    value: "~1.3k"
 ---

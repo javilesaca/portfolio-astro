@@ -1,8 +1,8 @@
 ---
 title: "Hockey Pong"
-description: "Clon moderno del clásico Pong con mecánicas de hockey aire, desarrollado en Unity. Incluye modo multijugador local, IA adaptativa, sistema de partículas y menús animados."
-shortDescription: "Juego tipo Pong/hockey aire en Unity con IA adaptativa y multijugador local."
-techStack: ["Unity", "C#", "DOTS/ECS", "URP", "Input System", "Cinemachine"]
+description: "Remake moderno del clásico Pong con mecánicas de hockey aire, desarrollado en Unity. Incluye multijugador local, partido contra rival IA, portero + delantero por equipo, variantes de pista y demo WebGL jugable."
+shortDescription: "Juego tipo Pong/hockey aire en Unity con rival IA y multijugador local."
+techStack: ["Unity 6", "C#", "URP", "Unity 2D", "TextMeshPro"]
 role: "Frontend"
 status: "completed"
 featured: true
@@ -11,22 +11,22 @@ endDate: "2023-12-15"
 repoUrl: "https://github.com/javilesaca/UnityHockeyPong"
 demoUrl: "https://lesacamedina.itch.io/hockey-pong"
 image: "../../../assets/HockeyPongB.jpeg"
-imageAlt: "Gameplay de Hockey Pong mostrando partida con efectos de partículas, trail de la pala y marcador"
+imageAlt: "Gameplay de Hockey Pong mostrando partida con efectos de partículas y marcador"
 challenges:
-  - "Implementar física determinista para juego competitivo justo"
-  - "IA adaptativa que aprende del estilo del jugador (dificultad dinámica)"
-  - "Optimización para 60 FPS en móviles con URP y DOTS/ECS"
-  - "Sistema de replay y ghost data para modo entrenamiento"
+  - "Juego de pista 2v2 con coordinación portero + delantero por equipo"
+  - "Rival IA que sigue el disco con MoveTowards y ajuste de velocidad por eje"
+  - "Flujo de escenas persistente con estado DontDestroyOnLoad + PlayerPrefs"
+  - "Build WebGL y pipeline de publicación en itch.io"
 learnings:
-  - "Arquitectura ECS en Unity para alto rendimiento"
-  - "Sistemas de input modernos (Input System package)"
-  - "Shader Graph para efectos visuales performantes"
-  - "Build pipeline para WebGL, Windows, macOS, Linux"
+  - "Configuración URP 2D en Unity 6"
+  - "Física Rigidbody2D para disco y jugadores"
+  - "Flujo de escenas y singletons persistentes"
+  - "Perfil de build WebGL e integración en navegador"
 metrics:
   - label: "FPS objetivo"
     value: "60+"
   - label: "Plataformas"
-    value: "5"
+    value: "WebGL"
   - label: "Líneas C#"
-    value: "~3.2k"
+    value: "~1.3k"
 ---

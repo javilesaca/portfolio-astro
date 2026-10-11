@@ -1,8 +1,8 @@
 ---
 title: "Hockey Pong"
-description: "Rilettura moderna del Pong con meccaniche air-hockey, in Unity. Multiplayer locale, IA adattiva, particelle e menu animati."
-shortDescription: "Gioco Pong/air-hockey in Unity con IA adattiva e multiplayer locale."
-techStack: ["Unity", "C#", "DOTS/ECS", "URP", "Input System", "Cinemachine"]
+description: "Remake moderno del classico Pong con meccaniche air-hockey, in Unity. Multiplayer locale, partita contro avversario IA, portiere + attaccante per squadra, varianti di pista e demo WebGL giocabile."
+shortDescription: "Gioco Pong/air-hockey in Unity con avversario IA e multiplayer locale."
+techStack: ["Unity 6", "C#", "URP", "Unity 2D", "TextMeshPro"]
 role: "Frontend"
 status: "completed"
 featured: true
@@ -11,22 +11,22 @@ endDate: "2023-12-15"
 repoUrl: "https://github.com/javilesaca/UnityHockeyPong"
 demoUrl: "https://lesacamedina.itch.io/hockey-pong"
 image: "../../../assets/HockeyPongB.jpeg"
-imageAlt: "Gameplay Hockey Pong con particelle, scia della racchetta e punteggio"
+imageAlt: "Gameplay Hockey Pong con particelle e punteggio"
 challenges:
-  - "Fisica deterministica per un gioco competitivo equo"
-  - "IA adattiva che impara lo stile del giocatore (difficoltà dinamica)"
-  - "Ottimizzazione 60 FPS su mobile con URP e DOTS/ECS"
-  - "Sistema di replay e ghost data per allenamento"
+  - "Gameplay 2v2 con coordinazione portiere + attaccante per squadra"
+  - "Avversario IA che segue il disco con regolazione della velocità per asse"
+  - "Flusso di scene persistente con stato DontDestroyOnLoad + PlayerPrefs"
+  - "Build WebGL e pipeline di pubblicazione su itch.io"
 learnings:
-  - "Architettura ECS in Unity per alte prestazioni"
-  - "Sistemi di input moderni (package Input System)"
-  - "Shader Graph per visuali performanti"
-  - "Pipeline di build per WebGL, Windows, macOS, Linux"
+  - "Setup URP 2D in Unity 6"
+  - "Fisica Rigidbody2D per disco e giocatori"
+  - "Flusso di scene e singleton persistenti"
+  - "Profilo di build WebGL e integrazione nel browser"
 metrics:
   - label: "FPS target"
     value: "60+"
   - label: "Piattaforme"
-    value: "5"
+    value: "WebGL"
   - label: "Righe C#"
-    value: "~3.2k"
+    value: "~1.3k"
 ---
