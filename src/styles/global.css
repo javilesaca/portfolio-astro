@@ -64,6 +64,19 @@ img {
 }
 
 /* ============================================================
+ * FIGURES — breathing room for demo media in case studies
+ * ============================================================ */
+figure {
+  margin: 2.5rem 0;
+}
+
+figcaption {
+  margin-top: 0.75rem;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
  * TYPOGRAPHY — Base styles
  * ============================================================ */
 h1, h2, h3, h4, h5, h6 {
